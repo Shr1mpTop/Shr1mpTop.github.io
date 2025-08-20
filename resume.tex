@@ -1,0 +1,108 @@
+\documentclass{resume}
+\usepackage{zh_CN-Adobefonts_external} 
+\usepackage{linespacing_fix}
+\usepackage{cite}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=cyan,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+\begin{document}
+\pagenumbering{gobble}
+
+%***"%"后面的所有内容是注释而非代码，不会输出到最后的PDF中
+%***使用本模板，只需要参照输出的PDF，在本文档的相应位置做简单替换即可
+%***修改之后，输出更新后的PDF，只需要点击Overleaf中的“Recompile”按钮即可
+
+%在大括号内填写其他信息，最多填写4个，但是如果选择不填信息，
+%那么大括号必须空着不写，而不能删除大括号。
+%\otherInfo后面的四个大括号里的所有信息都会在一行输出
+%如果想要写两行，那就用两次这个指令（\otherInfo{}{}{}{}）即可
+
+
+%***********个人信息**************
+\MyName{何致力}
+\sepspace
+\SimpleEntry{HEZH0014@e.ntu.edu.sg}
+\SimpleEntry{+8615982296295}
+\SimpleEntry{\href{https://github.com/Shr1mpTop}{个人主页：https://github.com/Shr1mpTop}}
+
+%************照片**************
+%照片需要放到images文件夹下，名字必须是you.jpg，注意.jpg后缀（可以去resume.cls第101行处修改），如果不需要照片可以不添加此行命令
+%0.15的意思是，照片的宽度是页面宽度的0.15倍，调整大小，避免遮挡文字
+\yourphoto{0.14}
+
+%***********教育背景**************
+\section{教育背景}
+%***第一个大括号里的内容向左对齐，第二个大括号里的内容向右对齐
+%***\textbf{}括号里的字是粗体，\textit{}括号里的字是斜体
+\datedsubsection{\textbf{南洋理工大学}，区块链，\textit{硕士}}{2025.8 - 2026.6 (Pending)}
+\datedsubsection{\textbf{电子科技大学}，数字媒体技术，\textit{本科}}{2021.9 - 2025.7}
+\begin{itemize}
+  \item 标兵奖学金 * 2、校社会优秀实践个人 * 1
+\end{itemize}
+
+%***********过往经历**************
+
+\section{项目经历}
+\datedsubsection{\textbf{基于深度学习胃肠道内窥镜图像智能诊断}}{2024.09 -- 2025.06}
+\Content
+{面向胃肠道内窥镜图像诊断任务，设计并实现基于 Mamba 架构的多分支视觉模型。}
+{负责模型的整体搭建与优化，包括数据预处理与增强、训练与验证流程设计、超参数调优及可视化分析；实现端到端训练与推理，并开发诊断系统原型。}
+{在 Kvasir 数据集测试集上取得准确率 87.25\%，优于多种主流对比模型；完成可{\href{https://github.com/Shr1mpTop/Gastrointestinal-Diagnosis-System}{交互诊断系统}}，实现在线推理与可视化结果展示。}
+
+\datedsubsection{\textbf{成都晓多科技有限公司}，研发实习生}{2024.12 -- 2025.3}
+\Content
+{参与电商智能客服大语言模型开发，涵盖数据清洗、模型微调和部署。}
+{独立搭建模型研发流程，基于DataForce实现训练数据自动采集和清洗，提升数据处理效率35\%。负责针对方太、美的等客户的模型微调与测试，保证对话准确稳定。}
+{成功上线30个智能客服Agent，对话准确率超过90\%，显著提升客户服务自动化，助力实现255万人民币回款。}
+
+\datedsubsection{\textbf{《Build and Defense》FPS 塔防游戏}，核心功能开发}{2024.03 -- 2024.06}
+\Content
+{在 Unity 引擎环境下主导建筑系统与 UI 模块的开发与优化，确保游戏核心机制的稳定性与可扩展性。}
+{配置实现建筑数据管理与逻辑控制，完成建筑系统的集成；优化 UI 交互流程与性能，提升操作响应速度；设计并实现多种建造元素与塔防策略的逻辑规则}
+{推动团队协作，成功交付系统，显著提升游戏策略深度与用户体验。}
+
+\datedsubsection{\textbf{《Time Traveler》3D 解谜游戏}，UI 系统设计与实现}{2023.09 -- 2024.01}
+\Content
+{在游戏设计课程团队项目中，负责 UI 设计与核心功能实现，包括小地图与剧情对话框模块。}
+{基于 Unity 引擎完成 UI 布局、交互逻辑与动画效果设计；在小地图模块中实现精确定位与动态更新，帮助玩家快速理解关卡布局；在剧情对话框模块中优化界面美观性与易用性，确保对话信息清晰传达。}
+{在课程评审中因 UI 系统功能完善与体验流畅获得导师高度评价，最终项目评分位列全班前 10\%。}
+
+\datedsubsection{\textbf{南洋理工大学人工智能实验室}}{2023.7}
+\Content
+{参与新冠肺炎CT图像智能诊断项目，负责深度学习模型设计与搭建。}
+{完成对照实验和消融实验，撰写并发表国际会议论文。}
+{基于自适应融合算法，模型准确率约93\%。}
+
+\section{专业技能}
+\datedsubsection{\textbf{编程语言}}{}
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Python（精通）}：独立完成深度学习模型构建与优化，熟悉数据处理与计算机视觉技术。
+  \item \textbf{C / C++（熟练）}：掌握系统编程、数据结构与算法实现。
+  \item \textbf{C\#（熟练）}：参与两款 Unity 游戏开发，负责核心逻辑与功能模块实现。
+  \item \textbf{Go（基础）}：实习期间搭建接口服务，熟悉并发模型与接口设计。
+\end{itemize}
+\datedsubsection{\textbf{工具与框架}}{}
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{深度学习框架}：熟练使用 PyTorch 与 TensorFlow 完成图像分类、目标检测及自然语言处理任务，具备模型构建、训练优化与部署经验。
+  \item \textbf{数据分析工具}：掌握 NumPy 与 Pandas，能够进行高效的数据清洗、特征工程及统计分析。
+  \item \textbf{数据库与后端}：具备 SQL 数据库设计与查询优化能力，熟悉 API 设计及后端接口开发流程。
+  \item \textbf{游戏与前端开发}：熟练使用 Unity 进行 2D/3D 游戏开发，掌握 HTML5、CSS、JavaScript 进行交互式 Web 页面实现。
+\end{itemize}
+
+\sepspace
+
+\section{奖励荣誉}
+\begin{itemize}
+  \item 标兵奖学金（2024）
+  \item 全国大学生市场调查与分析大赛（全国三等奖、省级一等奖，2024）
+  \item 标兵奖学金（2023）
+  \item 校社会优秀实践个人（2022）
+  \item 校园艺术节三等奖（2022）
+\end{itemize}
+\datedsubsection{\textbf{论文方面}：\href {https://www.ewadirect.com/proceedings/ace/article/view/15239xxx}{He, Z. (2024). Pneumonia image classification using convolutional neural network. \textit{Applied and Computational Engineering}, 67, 255-266.}}{2024}
+\end{document}
