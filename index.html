@@ -4,510 +4,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>何致力 | 深度学习工程师</title>
+    <title>何致力 | 区块链研究者</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="#home">何致力</a>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="profile-section">
+                <div class="profile-image-container">
+                    <img src="you.jpg" alt="何致力" class="sidebar-profile-image">
+                </div>
+                <h2 class="profile-name">何致力</h2>
+                <p class="profile-title">区块链研究者</p>
             </div>
-            <div class="nav-menu" id="nav-menu">
-                <a href="#home" class="nav-link">首页</a>
-                <a href="#about" class="nav-link">关于</a>
-                <a href="#education" class="nav-link">教育</a>
-                <a href="#experience" class="nav-link">经历</a>
-                <a href="#skills" class="nav-link">技能</a>
-                <a href="#achievements" class="nav-link">荣誉</a>
-                <a href="#contact" class="nav-link">联系</a>
-            </div>
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+        </div>
+
+        <div class="sidebar-nav">
+            <a href="#about" class="sidebar-link active">
+                <i class="fas fa-user"></i>
+                <span>个人简介</span>
+            </a>
+            <a href="#education" class="sidebar-link">
+                <i class="fas fa-graduation-cap"></i>
+                <span>教育背景</span>
+            </a>
+            <a href="#experience" class="sidebar-link">
+                <i class="fas fa-briefcase"></i>
+                <span>研究经历</span>
+            </a>
+            <a href="#skills" class="sidebar-link">
+                <i class="fas fa-code"></i>
+                <span>技术能力</span>
+            </a>
+            <a href="#achievements" class="sidebar-link">
+                <i class="fas fa-trophy"></i>
+                <span>荣誉奖项</span>
+            </a>
+            <a href="#contact" class="sidebar-link">
+                <i class="fas fa-envelope"></i>
+                <span>联系方式</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="social-links">
+                <a href="https://github.com/Shr1mpTop" target="_blank" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="mailto:HEZH0014@e.ntu.edu.sg" title="邮箱">
+                    <i class="fas fa-envelope"></i>
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">
-                        <span class="typing-text">你好，我是</span>
-                        <br>
-                        <span class="name-highlight">何致力</span>
-                    </h1>
-                    <p class="hero-subtitle">深度学习工程师 | AI研究者 | 游戏开发者</p>
-                    <p class="hero-description">
-                        专注于人工智能与深度学习技术，拥有丰富的项目经验和实战能力。
-                        即将就读于南洋理工大学区块链专业硕士。
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#contact" class="btn btn-primary">联系我</a>
-                        <a href="#about" class="btn btn-secondary">了解更多</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <div class="image-container">
-                        <img src="you.jpg" alt="何致力" class="profile-image">
-                        <div class="image-overlay"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="scroll-indicator">
-            <div class="scroll-arrow"></div>
-        </div>
-    </section>
+    <!-- Mobile Navigation Toggle -->
+    <div class="mobile-nav-toggle" id="mobile-toggle">
+        <i class="fas fa-bars"></i>
+    </div>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">关于我</h2>
-                <p class="section-subtitle">A passionate AI researcher and developer</p>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- About Section -->
+        <section id="about" class="content-section active">
+            <div class="section-container">
+                <div class="section-header">
+                    <h1 class="section-title">个人简介</h1>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="about-content">
+                    <div class="about-text">
+                        <p class="intro-paragraph">
+                            我是一名专注于人工智能与深度学习的研究者，目前即将前往南洋理工大学攻读区块链专业硕士学位。
+                            在电子科技大学数字媒体技术专业的本科学习中，我在计算机视觉和自然语言处理领域积累了扎实的理论基础和丰富的实践经验。
+                        </p>
+
+                        <p class="intro-paragraph">
+                            我的研究兴趣主要集中在深度学习模型的创新应用，特别是在医学图像分析和智能对话系统方面。
+                            通过参与多个产学研项目，我致力于将前沿的人工智能技术转化为解决实际问题的有效方案。
+                        </p>
+
+                        <div class="research-highlights">
+                            <h3>主要研究成果</h3>
+                            <div class="highlights-grid">
+                                <div class="highlight-item">
+                                    <div class="highlight-number">87.25%</div>
+                                    <div class="highlight-desc">胃肠道诊断模型准确率</div>
+                                </div>
+                                <div class="highlight-item">
+                                    <div class="highlight-number">30+</div>
+                                    <div class="highlight-desc">智能客服Agent部署</div>
+                                </div>
+                                <div class="highlight-item">
+                                    <div class="highlight-number">90%+</div>
+                                    <div class="highlight-desc">对话系统准确率</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="about-content">
-                <div class="about-text">
-                    <p class="about-description">
-                        我是一名充满热情的人工智能研究者和开发者，拥有扎实的深度学习理论基础和丰富的项目实践经验。
-                        在电子科技大学数字媒体技术专业的学习中，我专注于计算机视觉和自然语言处理领域的研究与应用。
-                    </p>
-                    <p class="about-description">
-                        即将前往南洋理工大学攻读区块链专业硕士学位，期待在新的学术环境中继续探索前沿技术。
-                        我热衷于将理论知识转化为实际应用，致力于用技术解决真实世界的问题。
-                    </p>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h1 class="section-title">教育背景</h1>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="education-content">
+                    <div class="education-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-year">2025 - 2026</div>
+                            <div class="timeline-content">
+                                <h3 class="institution-name">南洋理工大学</h3>
+                                <p class="degree-info">区块链专业 · 硕士学位</p>
+                                <p class="degree-status">即将入学</p>
+                                <div class="education-description">
+                                    <p>将深入学习区块链技术的前沿理论与应用，探索分布式系统、加密货币、智能合约等核心技术领域。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-year">2021 - 2025</div>
+                            <div class="timeline-content">
+                                <h3 class="institution-name">电子科技大学</h3>
+                                <p class="degree-info">数字媒体技术专业 · 学士学位</p>
+                                <div class="academic-achievements">
+                                    <div class="achievement-list">
+                                        <div class="achievement-item">
+                                            <i class="fas fa-medal"></i>
+                                            <span>标兵奖学金（连续两年）</span>
+                                        </div>
+                                        <div class="achievement-item">
+                                            <i class="fas fa-award"></i>
+                                            <span>校社会优秀实践个人</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="education-description">
+                                    <p>主修计算机图形学、数字图像处理、人工智能等核心课程，在计算机视觉和深度学习领域建立了扎实的理论基础。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h1 class="section-title">研究经历</h1>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="experience-content">
+                    <div class="research-projects">
+
+                        <div class="project-item">
+                            <div class="project-header">
+                                <div class="project-period">2024.09 - 2025.06</div>
+                                <div class="project-type">本科毕业设计</div>
+                            </div>
+                            <h3 class="project-title">基于深度学习的胃肠道内窥镜图像智能诊断系统</h3>
+                            <div class="project-details">
+                                <p class="project-description">
+                                    设计并实现基于Mamba架构的多分支视觉模型，针对胃肠道内窥镜图像进行智能诊断。
+                                    该项目结合了最新的深度学习技术与医学影像分析，为临床诊断提供辅助支持。
+                                </p>
+                                <div class="project-achievements">
+                                    <h4>主要贡献：</h4>
+                                    <ul>
+                                        <li>设计多分支Mamba架构，有效融合全局和局部特征信息</li>
+                                        <li>实现端到端的数据预处理、模型训练与推理流程</li>
+                                        <li>在Kvasir数据集测试集上达到87.25%的分类准确率</li>
+                                        <li>开发诊断系统原型，具备良好的临床应用潜力</li>
+                                    </ul>
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-tag">Python</span>
+                                    <span class="tech-tag">PyTorch</span>
+                                    <span class="tech-tag">Computer Vision</span>
+                                    <span class="tech-tag">Mamba</span>
+                                    <span class="tech-tag">Medical Imaging</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-item">
+                            <div class="project-header">
+                                <div class="project-period">2024.12 - 2025.03</div>
+                                <div class="project-type">产业实习</div>
+                            </div>
+                            <h3 class="project-title">电商智能客服大语言模型开发 - 成都晓多科技</h3>
+                            <div class="project-details">
+                                <p class="project-description">
+                                    参与面向电商领域的智能客服系统开发，负责大语言模型的数据处理、微调优化与生产部署。
+                                    项目涉及多个知名客户，包括方太、美的等家电品牌。
+                                </p>
+                                <div class="project-achievements">
+                                    <h4>主要成果：</h4>
+                                    <ul>
+                                        <li>基于DataForce平台实现训练数据自动采集与清洗，效率提升35%</li>
+                                        <li>针对不同客户需求进行模型微调，适配特定业务场景</li>
+                                        <li>成功部署30+智能客服Agent，对话准确率超过90%</li>
+                                        <li>项目总回款金额达255万元，获得客户高度认可</li>
+                                    </ul>
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-tag">Large Language Model</span>
+                                    <span class="tech-tag">Go</span>
+                                    <span class="tech-tag">Data Processing</span>
+                                    <span class="tech-tag">Model Fine-tuning</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-item">
+                            <div class="project-header">
+                                <div class="project-period">2023.07</div>
+                                <div class="project-type">国际合作研究</div>
+                            </div>
+                            <h3 class="project-title">新冠肺炎CT图像智能诊断 - 南洋理工大学AI实验室</h3>
+                            <div class="project-details">
+                                <p class="project-description">
+                                    参与南洋理工大学人工智能实验室的COVID-19诊断项目，基于深度学习技术
+                                    开发CT图像智能分析系统，为疫情防控提供技术支持。
+                                </p>
+                                <div class="project-achievements">
+                                    <h4>研究贡献：</h4>
+                                    <ul>
+                                        <li>设计基于自适应融合算法的深度学习模型</li>
+                                        <li>完成完整的对照实验与消融实验分析</li>
+                                        <li>模型在测试集上达到93%的诊断准确率</li>
+                                        <li>撰写并发表国际会议论文，获得学术认可</li>
+                                    </ul>
+                                </div>
+                                <div class="tech-stack">
+                                    <span class="tech-tag">Medical Imaging</span>
+                                    <span class="tech-tag">Deep Learning</span>
+                                    <span class="tech-tag">Academic Research</span>
+                                    <span class="tech-tag">Conference Paper</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <!-- Skills Section -->
+        <section id="skills" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h1 class="section-title">技术能力</h1>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="skills-content">
+                    <div class="skills-grid">
+
+                        <div class="skill-category">
+                            <h3 class="category-title">机器学习与深度学习</h3>
+                            <div class="skill-items">
+                                <div class="skill-item">
+                                    <div class="skill-name">PyTorch / TensorFlow</div>
+                                    <div class="skill-description">精通深度学习框架，擅长计算机视觉与自然语言处理任务</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Computer Vision</div>
+                                    <div class="skill-description">图像分类、目标检测、医学影像分析等领域经验丰富</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Natural Language Processing</div>
+                                    <div class="skill-description">大语言模型微调、智能对话系统开发经验</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3 class="category-title">编程语言</h3>
+                            <div class="skill-items">
+                                <div class="skill-item">
+                                    <div class="skill-name">Python</div>
+                                    <div class="skill-description">主要开发语言，数据科学、机器学习项目首选</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">C# / Unity</div>
+                                    <div class="skill-description">游戏开发经验，熟悉面向对象编程</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Go</div>
+                                    <div class="skill-description">后端服务开发，熟悉并发编程模型</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3 class="category-title">数据处理与分析</h3>
+                            <div class="skill-items">
+                                <div class="skill-item">
+                                    <div class="skill-name">NumPy / Pandas</div>
+                                    <div class="skill-description">数据清洗、特征工程、统计分析</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">SQL / Database</div>
+                                    <div class="skill-description">数据库设计、查询优化、数据建模</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Data Visualization</div>
+                                    <div class="skill-description">Matplotlib, Seaborn, 数据可视化</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section id="achievements" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h1 class="section-title">荣誉奖项</h1>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="achievements-content">
+                    <div class="achievements-list">
+
+                        <div class="achievement-item">
+                            <div class="achievement-year">2024, 2023</div>
+                            <div class="achievement-details">
+                                <h3 class="achievement-title">标兵奖学金</h3>
+                                <p class="achievement-description">连续两年获得电子科技大学最高荣誉奖学金，表彰学术成就和综合表现</p>
+                            </div>
+                        </div>
+
+                        <div class="achievement-item">
+                            <div class="achievement-year">2024</div>
+                            <div class="achievement-details">
+                                <h3 class="achievement-title">全国大学生市场调查与分析大赛</h3>
+                                <p class="achievement-description">全国三等奖 · 省级一等奖</p>
+                            </div>
+                        </div>
+
+                        <div class="achievement-item">
+                            <div class="achievement-year">2024</div>
+                            <div class="achievement-details">
+                                <h3 class="achievement-title">国际会议论文发表</h3>
+                                <p class="achievement-description">
+                                    "Pneumonia image classification using convolutional neural network"
+                                    - 基于深度学习的医学影像分析研究成果
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="achievement-item">
+                            <div class="achievement-year">2022</div>
+                            <div class="achievement-details">
+                                <h3 class="achievement-title">校社会优秀实践个人</h3>
+                                <p class="achievement-description">在社会实践活动中表现突出，获得学校表彰</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h1 class="section-title">联系方式</h1>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="contact-content">
                     <div class="contact-info">
                         <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>HEZH0014@e.ntu.edu.sg</span>
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h3>邮箱地址</h3>
+                                <p>HEZH0014@e.ntu.edu.sg</p>
+                            </div>
                         </div>
+
                         <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>+86 15982296295</span>
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h3>联系电话</h3>
+                                <p>+86 15982296295</p>
+                            </div>
                         </div>
+
                         <div class="contact-item">
-                            <i class="fab fa-github"></i>
-                            <a href="https://github.com/Shr1mpTop" target="_blank">GitHub主页</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">87.25%</div>
-                        <div class="stat-label">胃肠道诊断模型准确率</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">30+</div>
-                        <div class="stat-label">智能客服Agent上线</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">90%+</div>
-                        <div class="stat-label">对话准确率</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">255万</div>
-                        <div class="stat-label">项目回款金额</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Education Section -->
-    <section id="education" class="education">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">教育背景</h2>
-                <p class="section-subtitle">Educational Journey</p>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">2025.8 - 2026.6</div>
-                        <h3 class="timeline-title">南洋理工大学</h3>
-                        <p class="timeline-subtitle">区块链专业 | 硕士</p>
-                        <p class="timeline-description">即将入学，期待在新的学术环境中继续深造</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">2021.9 - 2025.7</div>
-                        <h3 class="timeline-title">电子科技大学</h3>
-                        <p class="timeline-subtitle">数字媒体技术专业 | 本科</p>
-                        <div class="achievements">
-                            <span class="achievement-tag">标兵奖学金 × 2</span>
-                            <span class="achievement-tag">校社会优秀实践个人</span>
+                            <div class="contact-icon">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h3>GitHub</h3>
+                                <p><a href="https://github.com/Shr1mpTop" target="_blank">github.com/Shr1mpTop</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience" class="experience">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">项目经历</h2>
-                <p class="section-subtitle">Professional Experience</p>
-            </div>
-            <div class="experience-grid">
-                <div class="experience-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="card-period">2024.09 - 2025.06</div>
-                    </div>
-                    <h3 class="card-title">基于深度学习胃肠道内窥镜图像智能诊断</h3>
-                    <p class="card-description">
-                        面向胃肠道内窥镜图像诊断任务，设计并实现基于 Mamba 架构的多分支视觉模型。
-                    </p>
-                    <ul class="card-responsibilities">
-                        <li>负责模型的整体搭建与优化，包括数据预处理与增强</li>
-                        <li>实现端到端训练与推理，并开发诊断系统原型</li>
-                        <li>在 Kvasir 数据集测试集上取得准确率 87.25%</li>
-                    </ul>
-                    <div class="card-tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">PyTorch</span>
-                        <span class="tag">Computer Vision</span>
-                        <span class="tag">Mamba</span>
-                    </div>
-                </div>
-
-                <div class="experience-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <div class="card-period">2024.12 - 2025.3</div>
-                    </div>
-                    <h3 class="card-title">成都晓多科技有限公司 - 研发实习生</h3>
-                    <p class="card-description">
-                        参与电商智能客服大语言模型开发，涵盖数据清洗、模型微调和部署。
-                    </p>
-                    <ul class="card-responsibilities">
-                        <li>基于DataForce实现训练数据自动采集和清洗，提升数据处理效率35%</li>
-                        <li>负责针对方太、美的等客户的模型微调与测试</li>
-                        <li>成功上线30个智能客服Agent，对话准确率超过90%</li>
-                    </ul>
-                    <div class="card-tags">
-                        <span class="tag">大语言模型</span>
-                        <span class="tag">Go</span>
-                        <span class="tag">数据清洗</span>
-                        <span class="tag">模型微调</span>
-                    </div>
-                </div>
-
-                <div class="experience-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="card-period">2024.03 - 2024.06</div>
-                    </div>
-                    <h3 class="card-title">《Build and Defense》FPS 塔防游戏</h3>
-                    <p class="card-description">
-                        在 Unity 引擎环境下主导建筑系统与 UI 模块的开发与优化。
-                    </p>
-                    <ul class="card-responsibilities">
-                        <li>配置实现建筑数据管理与逻辑控制</li>
-                        <li>优化 UI 交互流程与性能，提升操作响应速度</li>
-                        <li>设计并实现多种建造元素与塔防策略的逻辑规则</li>
-                    </ul>
-                    <div class="card-tags">
-                        <span class="tag">Unity</span>
-                        <span class="tag">C#</span>
-                        <span class="tag">游戏开发</span>
-                        <span class="tag">UI设计</span>
-                    </div>
-                </div>
-
-                <div class="experience-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-puzzle-piece"></i>
-                        </div>
-                        <div class="card-period">2023.09 - 2024.01</div>
-                    </div>
-                    <h3 class="card-title">《Time Traveler》3D 解谜游戏</h3>
-                    <p class="card-description">
-                        在游戏设计课程团队项目中，负责 UI 设计与核心功能实现。
-                    </p>
-                    <ul class="card-responsibilities">
-                        <li>基于 Unity 引擎完成 UI 布局、交互逻辑与动画效果设计</li>
-                        <li>实现小地图模块中的精确定位与动态更新</li>
-                        <li>在课程评审中获得导师高度评价，项目评分位列全班前 10%</li>
-                    </ul>
-                    <div class="card-tags">
-                        <span class="tag">Unity</span>
-                        <span class="tag">C#</span>
-                        <span class="tag">3D游戏</span>
-                        <span class="tag">UI/UX</span>
-                    </div>
-                </div>
-
-                <div class="experience-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-microscope"></i>
-                        </div>
-                        <div class="card-period">2023.7</div>
-                    </div>
-                    <h3 class="card-title">南洋理工大学人工智能实验室</h3>
-                    <p class="card-description">
-                        参与新冠肺炎CT图像智能诊断项目，负责深度学习模型设计与搭建。
-                    </p>
-                    <ul class="card-responsibilities">
-                        <li>完成对照实验和消融实验</li>
-                        <li>撰写并发表国际会议论文</li>
-                        <li>基于自适应融合算法，模型准确率约93%</li>
-                    </ul>
-                    <div class="card-tags">
-                        <span class="tag">医学影像</span>
-                        <span class="tag">深度学习</span>
-                        <span class="tag">学术研究</span>
-                        <span class="tag">论文发表</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">专业技能</h2>
-                <p class="section-subtitle">Technical Skills</p>
-            </div>
-            <div class="skills-grid">
-                <div class="skill-category">
-                    <h3 class="category-title">编程语言</h3>
-                    <div class="skill-items">
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">Python</span>
-                                <span class="skill-level">精通</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 95%"></div>
-                            </div>
-                            <p class="skill-description">独立完成深度学习模型构建与优化，熟悉数据处理与计算机视觉技术</p>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">C/C++</span>
-                                <span class="skill-level">熟练</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 80%"></div>
-                            </div>
-                            <p class="skill-description">掌握系统编程、数据结构与算法实现</p>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">C#</span>
-                                <span class="skill-level">熟练</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 85%"></div>
-                            </div>
-                            <p class="skill-description">参与两款 Unity 游戏开发，负责核心逻辑与功能模块实现</p>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">Go</span>
-                                <span class="skill-level">基础</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 60%"></div>
-                            </div>
-                            <p class="skill-description">实习期间搭建接口服务，熟悉并发模型与接口设计</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3 class="category-title">工具与框架</h3>
-                    <div class="skill-items">
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">深度学习框架</span>
-                                <span class="skill-level">精通</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 90%"></div>
-                            </div>
-                            <p class="skill-description">熟练使用 PyTorch 与 TensorFlow 完成图像分类、目标检测及自然语言处理任务</p>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">数据分析工具</span>
-                                <span class="skill-level">熟练</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 85%"></div>
-                            </div>
-                            <p class="skill-description">掌握 NumPy 与 Pandas，能够进行高效的数据清洗、特征工程及统计分析</p>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">数据库与后端</span>
-                                <span class="skill-level">熟练</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 75%"></div>
-                            </div>
-                            <p class="skill-description">具备 SQL 数据库设计与查询优化能力，熟悉 API 设计及后端接口开发流程</p>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">游戏与前端开发</span>
-                                <span class="skill-level">熟练</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" style="width: 80%"></div>
-                            </div>
-                            <p class="skill-description">熟练使用 Unity 进行 2D/3D 游戏开发，掌握 HTML5、CSS、JavaScript</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Achievements Section -->
-    <section id="achievements" class="achievements">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">奖励荣誉</h2>
-                <p class="section-subtitle">Awards & Achievements</p>
-            </div>
-            <div class="achievements-grid">
-                <div class="achievement-card">
-                    <div class="achievement-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3 class="achievement-title">标兵奖学金</h3>
-                    <p class="achievement-year">2024 & 2023</p>
-                    <p class="achievement-description">连续两年获得学校最高荣誉奖学金</p>
-                </div>
-                <div class="achievement-card">
-                    <div class="achievement-icon">
-                        <i class="fas fa-medal"></i>
-                    </div>
-                    <h3 class="achievement-title">全国大学生市场调查与分析大赛</h3>
-                    <p class="achievement-year">2024</p>
-                    <p class="achievement-description">全国三等奖 | 省级一等奖</p>
-                </div>
-                <div class="achievement-card">
-                    <div class="achievement-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <h3 class="achievement-title">校社会优秀实践个人</h3>
-                    <p class="achievement-year">2022</p>
-                    <p class="achievement-description">社会实践活动中表现优异</p>
-                </div>
-                <div class="achievement-card">
-                    <div class="achievement-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <h3 class="achievement-title">校园艺术节三等奖</h3>
-                    <p class="achievement-year">2022</p>
-                    <p class="achievement-description">展现了全面的综合素质</p>
-                </div>
-                <div class="achievement-card">
-                    <div class="achievement-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <h3 class="achievement-title">国际会议论文发表</h3>
-                    <p class="achievement-year">2024</p>
-                    <p class="achievement-description">
-                        <a href="https://www.ewadirect.com/proceedings/ace/article/view/15239xxx" target="_blank">
-                            Pneumonia image classification using convolutional neural network
-                        </a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">联系我</h2>
-                <p class="section-subtitle">Get In Touch</p>
-            </div>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h4>邮箱</h4>
-                            <p>HEZH0014@e.ntu.edu.sg</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h4>电话</h4>
-                            <p>+86 15982296295</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fab fa-github"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h4>GitHub</h4>
-                            <p><a href="https://github.com/Shr1mpTop" target="_blank">Shr1mpTop</a></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-form">
-                    <form>
-                        <div class="form-group">
-                            <input type="text" placeholder="您的姓名" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="您的邮箱" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" placeholder="主题" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea placeholder="留言内容" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">发送消息</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 何致力. All rights reserved.</p>
-        </div>
-    </footer>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
