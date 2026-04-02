@@ -15,14 +15,10 @@ This repository hosts the personal academic and professional website of Zhili He
 
 ## Structure
 
-- `index.html`: Main Chinese version of the website.
-- `index-en.html`: English version.
-- `index-fr.html`: French version.
-- `index-ja.html`: Japanese version.
-- `index-es.html`: Spanish version.
-- `index-de.html`: German version.
-- `style.css`: Cascading Style Sheets for consistent styling across all pages.
-- `script.js`: JavaScript for interactive elements (if applicable).
+- `index*.html`: Multi-language entry points of the website (Chinese, English, French, Japanese, Spanish, German).
+- `package.json`: Project configuration and Vite dependencies.
+- `src/main.js`: Core logic for text rendering, interactions, and multi-language switching.
+- `style.css`: Cascading Style Sheets for consistent styling.
 
 ## Technologies Used
 
