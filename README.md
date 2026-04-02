@@ -62,6 +62,8 @@ This website is automatically deployed via **GitHub Actions**. Every push to the
 
 To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.github.io).
 
+## Research Interests
+
 - **Blockchain and Distributed Systems**: Consensus algorithms, protocol design, smart contract security, and cross-chain integration.
 - **Artificial Intelligence and Deep Learning**: Computer vision, medical image analysis, natural language processing, and multi-agent systems.
 - **AI + Blockchain Convergence**: Privacy-preserving AI, trustworthy machine learning, and secure architectures for blockchain-AI systems.
