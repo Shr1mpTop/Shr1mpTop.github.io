@@ -1,223 +1,207 @@
-/* 严肃学术风格CSS - 允许黑色滚动条，填满文字 */
+/* Editorial Engine — Dark typographic style */
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
 html,
 body {
+  background: radial-gradient(ellipse at 50% 40%, #0f0f14 0%, #0a0a0c 100%);
+  color: #e8e4dc;
   height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: auto; /* 允许垂直滚动条 */
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 12px; /* 增大字体 */
-  line-height: 1.2; /* 稍微增加行高 */
-  color: #000;
-  background-color: #fff;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* 自定义滚动条为黑色 */
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #000;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #333;
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #000 #f1f1f1;
-}
-
-.language-switcher {
-  margin: 15px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.language-switcher a {
-  margin: 0 5px;
-  text-decoration: none;
-  color: #000;
-  font-weight: bold;
-}
-
-.language-switcher a:hover {
-  color: #666;
-}
-
-.container {
-  max-width: 100%;
-  height: 100vh;
-  padding: 20px 100px 50px 100px; /* 增加四周padding */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
-.header-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  flex: 0 0 auto;
-  height: 16vh; /* 增加顶部高度 */
-}
-
-.column {
-  flex: 1;
-  padding: 5px;
-  box-sizing: border-box;
   overflow: hidden;
 }
 
-.content-below {
-  flex: 1;
-  overflow: visible;
+body {
+  font-family:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino,
+    "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
+}
+
+#stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Text lines ── */
+.line {
+  position: absolute;
+  white-space: pre;
+  pointer-events: none;
+  z-index: 1;
+  color: #e8e4dc;
+}
+
+.headline-line {
+  position: absolute;
+  white-space: pre;
+  pointer-events: none;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+  z-index: 2;
+}
+
+.drop-cap {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  font-weight: 700;
+  color: #c4a35a;
+}
+
+/* ── Orbs ── */
+.pet {
+  position: absolute;
+  z-index: 10;
+  pointer-events: auto;
+  will-change: transform;
+  transition: filter 0.3s;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.35));
+}
+.pet img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+.pet.hovered {
+  filter: drop-shadow(0 6px 24px rgba(180, 160, 100, 0.5));
+}
+
+/* ── Pull quotes ── */
+.pullquote-box {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  border-left: 3px solid #6b5a3d;
+  padding-left: 14px;
+}
+.pullquote-box.pullquote-link {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.pullquote-box.pullquote-link:hover {
+  border-color: #d4a853;
+}
+.pullquote-line {
+  position: absolute;
+  white-space: pre;
+  pointer-events: none;
+  font-style: italic;
+  color: #b8a070;
+}
+
+/* ── Stats bar ── */
+.stats-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(6, 6, 10, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 24px;
   display: flex;
-  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  font:
+    400 12px/1 "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 100;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
-
-.skills-experience-row {
+.stat {
   display: flex;
-  gap: 20px;
-  margin-bottom: 10px;
+  gap: 6px;
+  align-items: center;
 }
-
-.skills-experience-row section {
-  flex: 1;
+.stat-value {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
 }
-.profile-section {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.profile-photo {
-  width: 100px;
-  height: auto;
-  margin-right: 15px;
-  border: 1px solid #000;
-  flex-shrink: 0;
-}
-
-.profile-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-text h1 {
-  margin: 0 0 5px 0;
-  font-size: 18px; /* 增大标题 */
-}
-
-.profile-text p {
-  margin: 2px 0;
-  font-size: 12px; /* 匹配全局字体 */
-}
-
-h1 {
-  font-size: 18px;
-  margin: 0 0 5px 0;
-  font-weight: bold;
-}
-
-.title,
-.affiliation,
-.education,
-.contact {
-  margin: 2px 0;
-  font-size: 12px;
-}
-
-section {
-  margin-bottom: 5px; /* 更紧凑 */
-}
-h2 {
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0 0 5px 0;
-  border-bottom: 1px solid #000;
-  padding-bottom: 2px;
-}
-
-h3 {
-  font-size: 13px;
-  font-weight: bold;
-  margin: 5px 0 3px 0;
-}
-
-h4 {
-  font-size: 12px;
-  font-weight: bold;
-  margin: 3px 0 2px 0;
-}
-
-p,
-li {
-  margin: 2px 0;
-  text-align: justify;
-}
-
-ul {
-  margin: 0 0 5px 0;
-  padding-left: 15px;
-}
-
-.projects {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.project {
-  flex: 1 1 45%;
-  min-width: 300px;
-}
-
-a {
-  color: #000;
-  text-decoration: underline;
-}
-
-a:hover {
-  color: #666;
-}
-
-.footer {
-  margin-top: auto;
-  text-align: center;
+.stat-label {
   font-size: 10px;
-  color: #666;
-  border-top: 1px solid #000;
-  padding-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .profile-section {
-    flex-direction: column;
-    text-align: center;
-  }
+/* ── Top bar (hint + lang) ── */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  z-index: 100;
+  pointer-events: none;
+}
 
-  .profile-photo {
-    margin: 0 auto 10px;
-  }
+.hint {
+  font:
+    400 13px/1 "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 8px 18px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 
-  .projects {
-    flex-direction: column;
-  }
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 8px 18px;
+  border-radius: 999px;
+}
 
-  .project {
-    min-width: unset;
-  }
+.lang-switch a {
+  font:
+    600 13px/1 "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+.lang-switch a:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+.lang-switch a.active {
+  color: #c4a35a;
+}
+
+.lang-sep {
+  font:
+    400 13px/1 "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Scrollbar (hidden for immersive feel) ── */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  scrollbar-width: none;
 }

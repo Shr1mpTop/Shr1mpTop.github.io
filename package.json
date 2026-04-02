@@ -1,0 +1,25 @@
+{
+  "name": "shr1mptop.github.io",
+  "version": "1.0.0",
+  "description": "This repository hosts the personal academic and professional website of Zhili He, a researcher specializing in distributed systems, blockchain technology, and artificial intelligence. The website serves as a comprehensive platform to showcase academic achievements, research interests, professional experience, and technical projects.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shr1mpTop/Shr1mpTop.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Shr1mpTop/Shr1mpTop.github.io/issues"
+  },
+  "homepage": "https://github.com/Shr1mpTop/Shr1mpTop.github.io#readme",
+  "devDependencies": {
+    "@chenglou/pretext": "^0.0.4",
+    "vite": "^8.0.3"
+  }
+}
