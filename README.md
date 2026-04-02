@@ -87,8 +87,14 @@ To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.git
 
 - **Email**: HEZH0014@e.ntu.edu.sg
 - **GitHub**: [Shr1mpTop](https://github.com/Shr1mpTop)
-- **LinkedIn**: [Zhili He](https://www.linkedin.com/in/zhili-he) (if applicable)
+- **LinkedIn**: [Zhili He](https://www.linkedin.com/in/zhili-he)
 
-## Research Interests</content>
+## License
+
+This project is licensed under the MIT License.
+
+## Acknowledgments
+
+This website represents a culmination of rigorous academic pursuit and professional dedication in the fields of computer science and technology. All content is original and reflects the author's commitment to advancing knowledge in distributed systems, blockchain, and artificial intelligence.</content>
 
 <parameter name="filePath">e:\github\Shr1mpTop.github.io\README.md
