@@ -26,11 +26,41 @@ This repository hosts the personal academic and professional website of Zhili He
 
 ## Technologies Used
 
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Deployment**: GitHub Pages
+- **Frontend Environment**: Vite, JavaScript Modules (ESM)
+- **UI & Typography Engine**: `@chenglou/pretext` for high-performance text rendering
+- **Styling**: Vanilla CSS3
+- **Deployment**: GitHub Pages (Automated via GitHub Actions)
 - **Version Control**: Git
 
-## Research Interests
+## Local Development
+
+Since this project uses Vite and npm packages, you need to run it in a Node.js environment locally.
+
+1. **Install Dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+2. **Run Local Development Server**:
+
+   ```bash
+   npm run dev
+   ```
+
+   This will start a local server (usually at `http://localhost:5173`) with Hot Module Replacement (HMR).
+
+3. **Build for Production**:
+   ```bash
+   npm run build
+   ```
+   This will bundle the Javascript and CSS into static files inside the `dist` folder.
+
+## Deployment
+
+This website is automatically deployed via **GitHub Actions**. Every push to the `main` branch triggers a workflow that builds the Vite project and deploys the static output to GitHub Pages.
+
+To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.github.io).
 
 - **Blockchain and Distributed Systems**: Consensus algorithms, protocol design, smart contract security, and cross-chain integration.
 - **Artificial Intelligence and Deep Learning**: Computer vision, medical image analysis, natural language processing, and multi-agent systems.
@@ -59,15 +89,5 @@ This repository hosts the personal academic and professional website of Zhili He
 - **GitHub**: [Shr1mpTop](https://github.com/Shr1mpTop)
 - **LinkedIn**: [Zhili He](https://www.linkedin.com/in/zhili-he) (if applicable)
 
-## Deployment
-
-This website is deployed via GitHub Pages. To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.github.io).
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-This website represents a culmination of rigorous academic pursuit and professional dedication in the fields of computer science and technology. All content is original and reflects the author's commitment to advancing knowledge in distributed systems, blockchain, and artificial intelligence.</content>
+## Research Interests</content>
 <parameter name="filePath">e:\github\Shr1mpTop.github.io\README.md
