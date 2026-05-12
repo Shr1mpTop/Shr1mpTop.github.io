@@ -1,749 +1,621 @@
-/**
- * Editorial Engine — Academic Portfolio
- * Pretext-powered text reflow around draggable orbs, 60fps, zero DOM reads.
- */
 import zh from "./locales/zh.js";
 import en from "./locales/en.js";
-import {
-  layout,
-  prepareWithSegments,
-  layoutWithLines,
-  layoutNextLine,
-  walkLineRanges,
-} from "@chenglou/pretext";
+import { layoutWithLines, prepareWithSegments } from "@chenglou/pretext";
+import * as THREE from "three";
 
-// ── Typography ──────────────────────────────────────────
-const FONT_FAMILY =
-  '"Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, "Songti SC", "SimSun", serif';
-const BODY_FONT = `17px ${FONT_FAMILY}`;
-const BODY_LINE_HEIGHT = 28;
-const HEADLINE_FONT_FAMILY = FONT_FAMILY;
-const PQ_FONT = `italic 18px ${FONT_FAMILY}`;
-const PQ_LINE_HEIGHT = 26;
-
-// ── Layout constants ────────────────────────────────────
-const GUTTER = 48;
-const COL_GAP = 40;
-const STATS_BAR_HEIGHT = 42;
-const DROP_CAP_LINES = 3;
-const MIN_SLOT_WIDTH = 50;
-
-// ── Locale data ─────────────────────────────────────────
 const locales = { zh, en };
 let currentLang = "zh";
 
-// ── Pull quotes per language ────────────────────────────
-const PULL_QUOTES = {
-  zh: [
-    {
-      text: "\u201C胃肠道诊断系统 \u00B7 Kvasir 87.25% \u2197\u201D",
-      link: "https://github.com/Shr1mpTop/Gastrointestinal-Diagnosis-System",
-    },
-    {
-      text: "\u201CHackathon_TornPrivacy \u00B7 ZKP隐私增强 \u2197\u201D",
-      link: "https://github.com/2022ljz/Hackathon_TornPrivacy",
-    },
-    {
-      text: "\u201C分布式预订系统 \u00B7 共识算法 \u2197\u201D",
-      link: "https://github.com/Shr1mpTop/Distributed_Facility_Booking_System",
-    },
-    { text: "\u201C数学建模省一 \u00B7 标兵奖学金\u00D72\u201D" },
-    {
-      text: "\u201CPyTorch \u00B7 Solidity \u00B7 LightGBM \u00B7 Docker\u201D",
-    },
-  ],
-  en: [
-    {
-      text: "\u201CGI Diagnosis \u00B7 Kvasir 87.25% \u2197\u201D",
-      link: "https://github.com/Shr1mpTop/Gastrointestinal-Diagnosis-System",
-    },
-    {
-      text: "\u201CTornPrivacy \u00B7 ZKP Privacy \u2197\u201D",
-      link: "https://github.com/2022ljz/Hackathon_TornPrivacy",
-    },
-    {
-      text: "\u201CDistributed Booking \u00B7 Consensus \u2197\u201D",
-      link: "https://github.com/Shr1mpTop/Distributed_Facility_Booking_System",
-    },
-    { text: "\u201CMath Modeling Prov. 1st \u00B7 Scholarship \u00D72\u201D" },
-    {
-      text: "\u201CPyTorch \u00B7 Solidity \u00B7 LightGBM \u00B7 Docker\u201D",
-    },
-  ],
-};
-
-// ── Headlines per language ──────────────────────────────
-const HEADLINES = {
-  zh: "\u4F55\u81F4\u529B \u00B7 \u5206\u5E03\u5F0F\u7CFB\u7EDF \u00B7 \u533A\u5757\u94FE \u00B7 \u4EBA\u5DE5\u667A\u80FD",
-  en: "ZHILI HE \u00B7 DISTRIBUTED SYSTEMS \u00B7 BLOCKCHAIN \u00B7 AI",
-};
-
-// ── Helpers ──────────────────────────────────────────────
-function stripHtml(html) {
-  return html.replace(/<[^>]*>/g, "");
-}
-
-function buildBodyText(d) {
-  const parts = [];
-  parts.push(d.bioText);
-  parts.push(
-    d.researchTitle +
-      "\u3000" +
-      d.researchPoints.map((p) => stripHtml(p)).join(" "),
-  );
-  parts.push(
-    stripHtml(d.pubHeading) +
-      "\u3000" +
-      d.pubList.map((p) => stripHtml(p)).join(" "),
-  );
-  parts.push(d.projHeading);
-  for (const proj of d.projList) {
-    parts.push(proj.title + " \u2014 " + proj.desc);
-  }
-  parts.push(
-    d.skillsTitle +
-      "\u3000" +
-      d.skills.map((s) => s.label + ": " + s.value).join(". ") +
-      ".",
-  );
-  parts.push(d.expTitle + "\u3000" + d.expList.join(" "));
-  parts.push(d.awardsTitle + "\u3000" + d.awardsList.join(" "));
-  parts.push(d.footer);
-  return parts.join("\n\n");
-}
-
-// ── Slot carving (text around obstacles) ────────────────
-function carveTextLineSlots(base, blocked) {
-  let slots = [base];
-  for (let bi = 0; bi < blocked.length; bi++) {
-    const iv = blocked[bi];
-    const next = [];
-    for (let si = 0; si < slots.length; si++) {
-      const s = slots[si];
-      if (iv.right <= s.left || iv.left >= s.right) {
-        next.push(s);
-        continue;
-      }
-      if (iv.left > s.left) next.push({ left: s.left, right: iv.left });
-      if (iv.right < s.right) next.push({ left: iv.right, right: s.right });
-    }
-    slots = next;
-  }
-  return slots.filter((s) => s.right - s.left >= MIN_SLOT_WIDTH);
-}
-
-function circleIntervalForBand(cx, cy, r, bandTop, bandBottom, hPad, vPad) {
-  const top = bandTop - vPad;
-  const bottom = bandBottom + vPad;
-  if (top >= cy + r || bottom <= cy - r) return null;
-  const minDy =
-    cy >= top && cy <= bottom ? 0 : cy < top ? top - cy : cy - bottom;
-  if (minDy >= r) return null;
-  const maxDx = Math.sqrt(r * r - minDy * minDy);
-  return { left: cx - maxDx - hPad, right: cx + maxDx + hPad };
-}
-
-// ── DOM ─────────────────────────────────────────────────
 const stage = document.getElementById("stage");
+const progressRail = document.createElement("div");
+progressRail.className = "scroll-rail";
+progressRail.innerHTML = '<span class="scroll-rail-fill"></span><span class="scroll-rail-node"></span>';
+stage.appendChild(progressRail);
 
-// ── Pets (replace orbs) ─────────────────────────────────
-const petDefs = [
-  { fx: 0.18, fy: 0.3, r: 60, hoverR: 90, src: "/pets/golden.svg" },
-  { fx: 0.75, fy: 0.25, r: 55, hoverR: 82, src: "/pets/orange-cat.svg" },
-  { fx: 0.5, fy: 0.6, r: 58, hoverR: 86, src: "/pets/cow-cat.svg" },
-  { fx: 0.28, fy: 0.72, r: 52, hoverR: 78, src: "/pets/shiba.svg" },
+const progressFill = progressRail.querySelector(".scroll-rail-fill");
+const progressNode = progressRail.querySelector(".scroll-rail-node");
+
+const ARCHIVED_COPY = {};
+const SECTION_IDS = [
+  "bio",
+  "research",
+  "publications",
+  "projects",
+  "skills",
+  "experience",
+  "awards",
 ];
+const BLOCK_TOP_Y = 15;
+const BLOCK_SPAN_Y = 31;
+const HELIX_STEP = 1.42;
+const BLOCK_ORBIT_RADIUS = 2.15;
+const CAMERA_ORBIT_RADIUS = 6.25;
+const BLOCK_BODY_FONT = '500 31px "Helvetica Neue", Arial, sans-serif';
+const BLOCK_BODY_LINE_HEIGHT = 42;
 
-function createPetEl(def) {
-  const el = document.createElement("div");
-  el.className = "pet";
-  const img = document.createElement("img");
-  img.src = def.src;
-  img.alt = "";
-  img.draggable = false;
-  el.appendChild(img);
-  stage.appendChild(el);
-  return el;
+function stripHtml(html = "") {
+  return String(html).replace(/<[^>]*>/g, "");
+}
+
+function archiveLocaleCopy(data) {
+  return {
+    hero: [data.headerName, data.headerTitle, data.headerDesc, data.headerEdu1, data.headerEdu2],
+    sections: {
+      bio: [data.bioTitle, data.bioText],
+      research: [data.researchTitle, ...(data.researchPoints || []).map(stripHtml)],
+      publications: [
+        stripHtml(data.pubHeading || data.pubTitle || "Publications"),
+        ...(data.pubList || []).map(stripHtml),
+      ],
+      projects: [data.projHeading, ...(data.projList || []).map((p) => `${p.title}: ${p.desc} ${p.stack}`)],
+      skills: [data.skillsTitle, ...(data.skills || []).map((s) => `${s.label}: ${s.value}`)],
+      experience: [data.expTitle, ...(data.expList || [])],
+      awards: [data.awardsTitle, ...(data.awardsList || []), data.footer],
+    },
+  };
+}
+
+Object.entries(locales).forEach(([lang, data]) => {
+  ARCHIVED_COPY[lang] = archiveLocaleCopy(data);
+});
+
+const sectionLinks = {
+  bio: "HeZhili_CV__English.pdf",
+  research: "https://github.com/Shr1mpTop",
+  publications: "https://www.ewadirect.com/proceedings/ace/article/view/15239xxx",
+  projects: "https://github.com/Shr1mpTop?tab=repositories",
+  skills: "https://github.com/Shr1mpTop",
+  experience: "HeZhili_CV__English.pdf",
+  awards: "HeZhili_CV__English.pdf",
+};
+
+const sectionColors = {
+  bio: 0x8fffe7,
+  research: 0x87b7ff,
+  publications: 0xffd36e,
+  projects: 0xb899ff,
+  skills: 0xff8b72,
+  experience: 0xff7fca,
+  awards: 0xd9ff75,
+};
+
+function compactText(parts, max = 170) {
+  const text = parts.filter(Boolean).map(stripHtml).join(" ").replace(/\s+/g, " ").trim();
+  return text.length > max ? `${text.slice(0, max - 1)}...` : text;
+}
+
+function buildBlocks(lang) {
+  const archive = ARCHIVED_COPY[lang] || ARCHIVED_COPY.en;
+  return SECTION_IDS.map((id, index) => {
+    const parts = archive.sections[id] || [];
+    const title = stripHtml(parts[0] || id).replace(/[?]+$/g, "");
+    return {
+      id,
+      index,
+      title: title || id.toUpperCase(),
+      body: compactText(parts.slice(1), id === "projects" ? 210 : 170),
+      link: sectionLinks[id],
+      color: sectionColors[id],
+    };
+  });
+}
+
+function colorToCss(hex, alpha = 1) {
+  const r = (hex >> 16) & 255;
+  const g = (hex >> 8) & 255;
+  const b = hex & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function makeAsciiTexture(seed, variant = "cyan") {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 2048;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '700 18px "Courier New", Consolas, monospace';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  let n = seed * 2654435761;
+  const rand = () => {
+    n = (n * 1664525 + 1013904223) >>> 0;
+    return n / 4294967296;
+  };
+  const chars = "01{}[]<>/\\|#$%&+=*-:;AIWEB3ZK";
+  const palette =
+    variant === "warm"
+      ? ["rgba(255, 224, 139,", "rgba(255, 127, 202,", "rgba(255, 255, 255,"]
+      : ["rgba(143, 255, 231,", "rgba(135, 183, 255,", "rgba(255, 255, 255,"];
+
+  for (let y = 8; y < canvas.height; y += 24) {
+    for (let x = 16; x < canvas.width; x += 24) {
+      if (rand() < 0.18) continue;
+      const alpha = 0.14 + rand() * 0.78;
+      ctx.fillStyle = `${palette[Math.floor(rand() * palette.length)]}${alpha})`;
+      ctx.fillText(chars[Math.floor(rand() * chars.length)], x + (rand() - 0.5) * 8, y);
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 2.8);
+  texture.anisotropy = 8;
+  return texture;
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const prepared = prepareWithSegments(String(text), ctx.font);
+  const result = layoutWithLines(prepared, maxWidth, lineHeight);
+  result.lines.slice(0, maxLines).forEach((line, i) => {
+    ctx.fillText(line.text, x, y + i * lineHeight);
+  });
+}
+
+function makeBlockTexture(block) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  const accent = block.color;
+
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, "rgba(4, 8, 14, 0.82)");
+  gradient.addColorStop(0.52, colorToCss(accent, 0.16));
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0.92)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = colorToCss(accent, 0.76);
+  ctx.lineWidth = 3;
+  ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+  ctx.strokeRect(46, 46, canvas.width - 92, canvas.height - 92);
+
+  ctx.font = '700 24px "Courier New", Consolas, monospace';
+  ctx.fillStyle = colorToCss(accent, 0.95);
+  ctx.fillText(`BLOCK ${String(block.index + 1).padStart(2, "0")} / ${block.id.toUpperCase()}`, 76, 96);
+
+  ctx.font = '800 58px "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+  ctx.fillText(block.title.toUpperCase(), 74, 178);
+
+  ctx.font = BLOCK_BODY_FONT;
+  ctx.fillStyle = "rgba(225, 244, 255, 0.78)";
+  wrapCanvasText(ctx, block.body, 78, 252, 820, BLOCK_BODY_LINE_HEIGHT, 4);
+
+  ctx.font = '700 18px "Courier New", Consolas, monospace';
+  ctx.fillStyle = "rgba(255, 255, 255, 0.34)";
+  ctx.fillText("SELF-LIT DATA NODE // CLICK TO OPEN", 76, 444);
+
+  for (let i = 0; i < 90; i++) {
+    const x = 54 + Math.random() * 910;
+    const y = 54 + Math.random() * 400;
+    ctx.fillStyle = colorToCss(accent, 0.08 + Math.random() * 0.18);
+    ctx.fillRect(x, y, 1 + Math.random() * 3, 1 + Math.random() * 3);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  return texture;
 }
 
 const W0 = window.innerWidth;
 const H0 = window.innerHeight;
-const pets = petDefs.map((d) => ({
-  x: d.fx * W0,
-  y: d.fy * H0,
-  baseR: d.r,
-  hoverR: d.hoverR,
-  r: d.r,
-  targetR: d.r,
-  vx: 0,
-  vy: 0,
-  dragging: false,
-  dragStartX: 0,
-  dragStartY: 0,
-  dragStartPetX: 0,
-  dragStartPetY: 0,
-  el: createPetEl(d),
-}));
+const canvas = document.createElement("canvas");
+canvas.className = "world-canvas";
+stage.appendChild(canvas);
 
-// ── Wait for fonts ──────────────────────────────────────
-await document.fonts.ready;
-
-// ── Prepared text state ─────────────────────────────────
-let preparedBody;
-let preparedPQ = [];
-let headlineText = "";
-
-const DROP_CAP_SIZE = BODY_LINE_HEIGHT * DROP_CAP_LINES - 4;
-const DROP_CAP_FONT = `700 ${DROP_CAP_SIZE}px ${FONT_FAMILY}`;
-let DROP_CAP_TOTAL_W = 0;
-
-const dropCapEl = document.createElement("div");
-dropCapEl.className = "drop-cap";
-stage.appendChild(dropCapEl);
-
-// ── Headline cache (must be declared before prepareLang) ─
-let cachedHeadlineKey = "";
-let cachedHeadlineFontSize = 24;
-let cachedHeadlineLines = [];
-
-function prepareLang(lang) {
-  const d = locales[lang] || locales.zh;
-  headlineText = HEADLINES[lang] || HEADLINES.zh;
-  const bodyText = buildBodyText(d);
-  const pullQuoteEntries = PULL_QUOTES[lang] || PULL_QUOTES.zh;
-
-  // Drop cap — first character; prepare body WITHOUT it to avoid CJK cursor issues
-  const firstChar = bodyText[0];
-  const bodyTextAfterDropCap = bodyText.slice(1);
-  preparedBody = prepareWithSegments(bodyTextAfterDropCap, BODY_FONT);
-  preparedPQ = pullQuoteEntries.map((pq) => ({
-    prepared: prepareWithSegments(pq.text, PQ_FONT),
-    link: pq.link || null,
-  }));
-  const preparedDropCap = prepareWithSegments(firstChar, DROP_CAP_FONT);
-  let dcw = 0;
-  walkLineRanges(preparedDropCap, 9999, (line) => {
-    dcw = line.width;
-  });
-  DROP_CAP_TOTAL_W = Math.ceil(dcw) + 10;
-  dropCapEl.textContent = firstChar;
-  dropCapEl.style.font = DROP_CAP_FONT;
-  dropCapEl.style.lineHeight = DROP_CAP_SIZE + "px";
-
-  // Invalidate headline cache
-  cachedHeadlineKey = "";
-
-  // Update lang indicator
-  const sLang = document.getElementById("sLang");
-  if (sLang) sLang.textContent = lang.toUpperCase();
-
-  // Update active lang button
-  document.querySelectorAll(".lang-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.lang === lang);
-  });
-}
-
-// Initial preparation
-prepareLang(currentLang);
-
-// ── Language switching ──────────────────────────────────
-document.querySelectorAll(".lang-btn").forEach((btn) => {
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    const lang = btn.dataset.lang;
-    if (lang && lang !== currentLang) {
-      currentLang = lang;
-      prepareLang(lang);
-    }
-  });
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
+  antialias: true,
+  powerPreference: "high-performance",
 });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(0x000000, 0);
 
-// ── Element pools ───────────────────────────────────────
-const linePool = [];
-const headlinePool = [];
-const pqLinePool = [];
-const pqBoxPool = [];
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x03050a, 0.035);
 
-function syncPool(pool, count, className) {
-  while (pool.length < count) {
-    const el = document.createElement("div");
-    el.className = className;
-    stage.appendChild(el);
-    pool.push(el);
-  }
-  for (let i = 0; i < pool.length; i++) {
-    pool[i].style.display = i < count ? "" : "none";
-  }
+const camera = new THREE.PerspectiveCamera(48, W0 / H0, 0.1, 120);
+const cameraTarget = new THREE.Vector3();
+const desiredCamera = new THREE.Vector3();
+const desiredTarget = new THREE.Vector3();
+
+const dataColumn = new THREE.Group();
+scene.add(dataColumn);
+
+const streamLayers = [];
+for (let i = 0; i < 14; i++) {
+  const radius = 0.48 + i * 0.035;
+  const height = 44;
+  const thetaLength = Math.PI * (0.26 + (i % 4) * 0.08);
+  const thetaStart = (i / 14) * Math.PI * 2;
+  const texture = makeAsciiTexture(i + 11, i % 5 === 0 ? "warm" : "cyan");
+  const geometry = new THREE.CylinderGeometry(radius, radius, height, 28, 1, true, thetaStart, thetaLength);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    opacity: 0.18 + (i % 5) * 0.045,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.y = i * 0.38;
+  dataColumn.add(mesh);
+  streamLayers.push({
+    mesh,
+    texture,
+    speed: 0.06 + (i % 6) * 0.022,
+    direction: i % 2 === 0 ? 1 : -1,
+    spin: (i % 2 === 0 ? 1 : -1) * (0.035 + i * 0.002),
+  });
 }
 
-// ── Headline fitting (binary search) ────────────────────
+const haloGeometry = new THREE.CylinderGeometry(0.72, 0.72, 44, 64, 1, true);
+const haloMaterial = new THREE.MeshBasicMaterial({
+  color: 0x87b7ff,
+  transparent: true,
+  opacity: 0.045,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  side: THREE.DoubleSide,
+});
+const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+dataColumn.add(halo);
 
-function fitHeadline(maxWidth, maxHeight) {
-  const key = `${maxWidth}:${maxHeight}:${headlineText}`;
-  if (key === cachedHeadlineKey)
-    return { fontSize: cachedHeadlineFontSize, lines: cachedHeadlineLines };
-  cachedHeadlineKey = key;
+const axisMaterial = new THREE.MeshBasicMaterial({
+  color: 0xdffcff,
+  transparent: true,
+  opacity: 0.36,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+const axis = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 44, 16), axisMaterial);
+dataColumn.add(axis);
 
-  let lo = 24,
-    hi = 100,
-    best = lo;
-  let bestLines = [];
+const blockGroup = new THREE.Group();
+scene.add(blockGroup);
 
-  while (lo <= hi) {
-    const size = Math.floor((lo + hi) / 2);
-    const font = `700 ${size}px ${HEADLINE_FONT_FAMILY}`;
-    const lh = Math.round(size * 0.93);
-    const prepared = prepareWithSegments(headlineText, font);
-    let breaksWord = false;
-    let lineCount = 0;
-    walkLineRanges(prepared, maxWidth, (line) => {
-      lineCount++;
-      if (line.end.graphemeIndex !== 0) breaksWord = true;
+const helixPoints = [];
+for (let i = 0; i <= 360; i++) {
+  const u = i / 360;
+  const angle = u * HELIX_STEP * (SECTION_IDS.length - 1);
+  const y = BLOCK_TOP_Y - u * BLOCK_SPAN_Y;
+  helixPoints.push(
+    new THREE.Vector3(
+      Math.cos(angle) * (BLOCK_ORBIT_RADIUS - 0.28),
+      y,
+      Math.sin(angle) * (BLOCK_ORBIT_RADIUS - 0.28),
+    ),
+  );
+}
+const helixGuide = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints(helixPoints),
+  new THREE.LineBasicMaterial({
+    color: 0xbfefff,
+    transparent: true,
+    opacity: 0.18,
+    blending: THREE.AdditiveBlending,
+  }),
+);
+scene.add(helixGuide);
+
+let blocks = [];
+let blockMeshes = [];
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2(-10, -10);
+let hoveredMesh = null;
+let activeIndex = 0;
+const initialProgress = clamp01(Number(new URLSearchParams(window.location.search).get("p")) || 0.02);
+let scrollProgress = initialProgress;
+let targetScrollProgress = initialProgress;
+let draggingRail = false;
+let lastTime = performance.now();
+
+function disposeObject(object) {
+  object.traverse((child) => {
+    if (child.geometry) child.geometry.dispose();
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.filter(Boolean).forEach((material) => {
+      if (material.map) material.map.dispose();
+      material.dispose();
     });
-    const totalH = lineCount * lh;
-    if (!breaksWord && totalH <= maxHeight) {
-      best = size;
-      const result = layoutWithLines(prepared, maxWidth, lh);
-      bestLines = result.lines.map((l, i) => ({
-        x: 0,
-        y: i * lh,
-        text: l.text,
-        width: l.width,
-      }));
-      lo = size + 1;
-    } else {
-      hi = size - 1;
-    }
-  }
-
-  cachedHeadlineFontSize = best;
-  cachedHeadlineLines = bestLines;
-  return { fontSize: best, lines: bestLines };
+  });
 }
 
-// ── Column layout (text reflow around obstacles) ────────
-function layoutColumn(
-  prepared,
-  startCursor,
-  regionX,
-  regionY,
-  regionW,
-  regionH,
-  lineHeight,
-  circleObs,
-  rectObstacles,
-) {
-  let cursor = startCursor;
-  let lineTop = regionY;
-  const lines = [];
-  let textExhausted = false;
-
-  while (lineTop + lineHeight <= regionY + regionH && !textExhausted) {
-    const bandTop = lineTop;
-    const bandBottom = lineTop + lineHeight;
-    const blocked = [];
-
-    for (let oi = 0; oi < circleObs.length; oi++) {
-      const c = circleObs[oi];
-      const iv = circleIntervalForBand(
-        c.cx,
-        c.cy,
-        c.r,
-        bandTop,
-        bandBottom,
-        c.hPad,
-        c.vPad,
-      );
-      if (iv !== null) blocked.push(iv);
-    }
-    for (let ri = 0; ri < rectObstacles.length; ri++) {
-      const r = rectObstacles[ri];
-      if (bandBottom <= r.y || bandTop >= r.y + r.h) continue;
-      blocked.push({ left: r.x, right: r.x + r.w });
-    }
-
-    const slots = carveTextLineSlots(
-      { left: regionX, right: regionX + regionW },
-      blocked,
+function rebuildBlocks() {
+  blockMeshes.forEach((mesh) => {
+    blockGroup.remove(mesh);
+    disposeObject(mesh);
+  });
+  blocks = buildBlocks(currentLang);
+  blockMeshes = blocks.map((block, index) => {
+    const texture = makeBlockTexture(block);
+    const front = new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+    });
+    const edge = new THREE.MeshBasicMaterial({
+      color: block.color,
+      transparent: true,
+      opacity: 0.24,
+      blending: THREE.AdditiveBlending,
+    });
+    const geometry = new THREE.BoxGeometry(2.25, 1.14, 0.08);
+    const mesh = new THREE.Mesh(geometry, [edge, edge, edge, edge, front, front]);
+    const line = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geometry),
+      new THREE.LineBasicMaterial({
+        color: block.color,
+        transparent: true,
+        opacity: 0.72,
+        blending: THREE.AdditiveBlending,
+      }),
     );
-    if (slots.length === 0) {
-      lineTop += lineHeight;
-      continue;
+    mesh.add(line);
+    mesh.userData.block = block;
+    mesh.userData.front = front;
+    mesh.userData.edge = edge;
+    mesh.userData.line = line;
+    blockGroup.add(mesh);
+    return mesh;
+  });
+}
+
+function seededDust() {
+  let seed = 1187;
+  return () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+}
+
+const rand = seededDust();
+const dustCount = 2600;
+const dustPositions = new Float32Array(dustCount * 3);
+const dustColors = new Float32Array(dustCount * 3);
+const dustSizes = new Float32Array(dustCount);
+for (let i = 0; i < dustCount; i++) {
+  const i3 = i * 3;
+  const angle = rand() * Math.PI * 2;
+  const radius = 1.2 + Math.pow(rand(), 0.62) * 8.8;
+  dustPositions[i3] = Math.cos(angle) * radius;
+  dustPositions[i3 + 1] = -21 + rand() * 42;
+  dustPositions[i3 + 2] = Math.sin(angle) * radius - 2.2;
+  const blueTint = rand() * 0.12;
+  dustColors[i3] = 0.78 + rand() * 0.22;
+  dustColors[i3 + 1] = 0.8 + rand() * 0.2;
+  dustColors[i3 + 2] = 0.86 + blueTint;
+  dustSizes[i] = 0.012 + Math.pow(rand(), 2) * 0.052;
+}
+
+const dustGeometry = new THREE.BufferGeometry();
+dustGeometry.setAttribute("position", new THREE.BufferAttribute(dustPositions, 3));
+dustGeometry.setAttribute("color", new THREE.BufferAttribute(dustColors, 3));
+dustGeometry.setAttribute("size", new THREE.BufferAttribute(dustSizes, 1));
+
+const dustMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    opacity: { value: 0.62 },
+  },
+  transparent: true,
+  vertexColors: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  vertexShader: `
+    attribute float size;
+    varying vec3 vColor;
+    void main() {
+      vColor = color;
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = size * (420.0 / max(0.1, -mvPosition.z));
+      gl_Position = projectionMatrix * mvPosition;
     }
-    slots.sort((a, b) => a.left - b.left);
-
-    for (let si = 0; si < slots.length; si++) {
-      const slot = slots[si];
-      const slotWidth = slot.right - slot.left;
-      const line = layoutNextLine(prepared, cursor, slotWidth);
-      if (line === null) {
-        textExhausted = true;
-        break;
-      }
-      lines.push({
-        x: Math.round(slot.left),
-        y: Math.round(lineTop),
-        text: line.text,
-        width: line.width,
-      });
-      cursor = line.end;
+  `,
+  fragmentShader: `
+    uniform float opacity;
+    varying vec3 vColor;
+    void main() {
+      vec2 p = gl_PointCoord - vec2(0.5);
+      float d = length(p);
+      float core = smoothstep(0.5, 0.0, d);
+      float bloom = smoothstep(0.5, 0.18, d) * 0.42;
+      gl_FragColor = vec4(vColor, (core + bloom) * opacity);
     }
-    lineTop += lineHeight;
-  }
-  return { lines, cursor };
+  `,
+});
+const dust = new THREE.Points(dustGeometry, dustMaterial);
+scene.add(dust);
+
+const distantDust = dust.clone();
+distantDust.material = dustMaterial.clone();
+distantDust.material.uniforms.opacity.value = 0.25;
+distantDust.scale.setScalar(1.85);
+distantDust.rotation.y = Math.PI * 0.18;
+scene.add(distantDust);
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
 }
 
-// ── Pointer / Drag + Hover interaction ──────────────────
-let activePet = null;
-let pointerX = -9999;
-let pointerY = -9999;
-
-function hitTestPets(px, py) {
-  for (let i = pets.length - 1; i >= 0; i--) {
-    const p = pets[i];
-    const dx = px - p.x,
-      dy = py - p.y;
-    if (dx * dx + dy * dy <= p.hoverR * p.hoverR) return p;
-  }
-  return null;
+function resize(width, height) {
+  renderer.setSize(width, height, false);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
 }
 
-stage.addEventListener("click", (e) => {
-  const box = e.target.closest(".pullquote-link");
-  if (box && box.dataset.link) {
-    window.open(box.dataset.link, "_blank", "noopener");
-  }
-});
-
-stage.addEventListener("pointerdown", (e) => {
-  const pet = hitTestPets(e.clientX, e.clientY);
-  if (pet) {
-    activePet = pet;
-    pet.dragging = true;
-    pet.vx = 0;
-    pet.vy = 0;
-    pet.dragStartX = e.clientX;
-    pet.dragStartY = e.clientY;
-    pet.dragStartPetX = pet.x;
-    pet.dragStartPetY = pet.y;
-    e.preventDefault();
-  }
-});
-
-window.addEventListener("pointermove", (e) => {
-  pointerX = e.clientX;
-  pointerY = e.clientY;
-  if (activePet) {
-    activePet.x = activePet.dragStartPetX + (e.clientX - activePet.dragStartX);
-    activePet.y = activePet.dragStartPetY + (e.clientY - activePet.dragStartY);
-  }
-  for (let i = 0; i < pets.length; i++) {
-    const p = pets[i];
-    const dx = e.clientX - p.x,
-      dy = e.clientY - p.y;
-    const inside = dx * dx + dy * dy <= p.hoverR * p.hoverR;
-    p.targetR = inside ? p.hoverR : p.baseR;
-    p.el.classList.toggle("hovered", inside);
-  }
-});
-
-window.addEventListener("pointerup", () => {
-  if (activePet) {
-    activePet.dragging = false;
-    activePet = null;
-  }
-});
-
-// ── FPS tracking ────────────────────────────────────────
-const fpsTimestamps = [];
-let fpsDisplay = 60;
-function updateFPS(now) {
-  fpsTimestamps.push(now);
-  while (fpsTimestamps.length > 0 && fpsTimestamps[0] < now - 1000)
-    fpsTimestamps.shift();
-  fpsDisplay = fpsTimestamps.length;
+function getCameraOrbitRadius() {
+  const w = document.documentElement.clientWidth;
+  return w < 520 ? 9.7 : w < 760 ? 8.6 : CAMERA_ORBIT_RADIUS;
 }
 
-// ── Stats elements ──────────────────────────────────────
-const elSLines = document.getElementById("sLines");
-const elSReflow = document.getElementById("sReflow");
-const elSDom = document.getElementById("sDom");
-const elSFps = document.getElementById("sFps");
-const elSCols = document.getElementById("sCols");
+function getPanelScaleFactor() {
+  const w = document.documentElement.clientWidth;
+  return w < 520 ? 0.78 : w < 760 ? 0.88 : 1;
+}
 
-// ── Animation loop ──────────────────────────────────────
-let lastTime = 0;
+function setScrollFromClientY(clientY) {
+  const rect = progressRail.getBoundingClientRect();
+  targetScrollProgress = clamp01((clientY - rect.top) / rect.height);
+}
+
+progressRail.addEventListener("pointerdown", (event) => {
+  draggingRail = true;
+  progressRail.setPointerCapture(event.pointerId);
+  setScrollFromClientY(event.clientY);
+  event.preventDefault();
+});
+
+progressRail.addEventListener("pointermove", (event) => {
+  if (draggingRail) setScrollFromClientY(event.clientY);
+});
+
+progressRail.addEventListener("pointerup", () => {
+  draggingRail = false;
+});
+
+window.addEventListener(
+  "wheel",
+  (event) => {
+    if (event.ctrlKey) return;
+    targetScrollProgress = clamp01(targetScrollProgress + event.deltaY / 4200);
+    event.preventDefault();
+  },
+  { passive: false },
+);
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " ") {
+    targetScrollProgress = clamp01(targetScrollProgress + 0.12);
+    event.preventDefault();
+  }
+  if (event.key === "ArrowUp" || event.key === "PageUp") {
+    targetScrollProgress = clamp01(targetScrollProgress - 0.12);
+    event.preventDefault();
+  }
+  if (event.key === "Home") targetScrollProgress = 0;
+  if (event.key === "End") targetScrollProgress = 1;
+});
+
+window.addEventListener("pointermove", (event) => {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+});
+
+stage.addEventListener("click", () => {
+  if (!hoveredMesh) return;
+  const link = hoveredMesh.userData.block?.link;
+  if (link) window.open(link, "_blank", "noopener");
+});
+
+document.querySelectorAll(".lang-btn").forEach((btn) => {
+  btn.addEventListener("click", (event) => {
+    event.preventDefault();
+    const lang = btn.dataset.lang;
+    if (!lang || lang === currentLang) return;
+    currentLang = lang;
+    document.querySelectorAll(".lang-btn").forEach((item) => {
+      item.classList.toggle("active", item.dataset.lang === currentLang);
+    });
+    rebuildBlocks();
+  });
+});
+
+function updateBlocks(time, dt) {
+  activeIndex = Math.round(scrollProgress * Math.max(1, blockMeshes.length - 1));
+
+  blockMeshes.forEach((mesh, index) => {
+    const angle = index * HELIX_STEP;
+    const y = BLOCK_TOP_Y - index * (BLOCK_SPAN_Y / Math.max(1, blockMeshes.length - 1));
+    const orbit = BLOCK_ORBIT_RADIUS + Math.sin(time * 0.72 + index) * 0.035;
+    const focus = index === activeIndex;
+    const hover = mesh === hoveredMesh;
+    const progressY = BLOCK_TOP_Y - scrollProgress * BLOCK_SPAN_Y;
+    const distFromCamera = Math.abs(y - progressY);
+    const visibility = clamp01(1.25 - distFromCamera / 7.2);
+    const scale =
+      (0.82 + visibility * 0.22 + (focus ? 0.16 : 0) + (hover ? 0.08 : 0)) *
+      getPanelScaleFactor();
+
+    mesh.position.set(Math.cos(angle) * orbit, y, Math.sin(angle) * orbit);
+    mesh.rotation.set(0, Math.PI / 2 - angle, 0);
+    mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), Math.min(dt * 7, 1));
+    mesh.userData.front.opacity = 0.24 + visibility * 0.55 + (focus || hover ? 0.22 : 0);
+    mesh.userData.edge.opacity = 0.08 + visibility * 0.16 + (focus || hover ? 0.16 : 0);
+    mesh.userData.line.material.opacity = 0.24 + visibility * 0.46 + (focus || hover ? 0.22 : 0);
+    mesh.visible = visibility > 0.03;
+  });
+}
+
+function updatePointer() {
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(blockMeshes.filter((mesh) => mesh.visible), false);
+  hoveredMesh = hits[0]?.object || null;
+  document.body.style.cursor = hoveredMesh ? "pointer" : "";
+}
+
+function updateCamera(dt) {
+  const y = BLOCK_TOP_Y - scrollProgress * BLOCK_SPAN_Y;
+  const cameraAngle = scrollProgress * HELIX_STEP * Math.max(1, blockMeshes.length - 1);
+  const activeAngle = activeIndex * HELIX_STEP;
+  const blendedAngle = THREE.MathUtils.lerp(cameraAngle, activeAngle, 0.18);
+  desiredCamera.set(
+    Math.cos(blendedAngle) * getCameraOrbitRadius(),
+    y + 0.24,
+    Math.sin(blendedAngle) * getCameraOrbitRadius(),
+  );
+  desiredTarget.set(
+    Math.cos(blendedAngle) * 0.22,
+    y - 0.08,
+    Math.sin(blendedAngle) * 0.22,
+  );
+  const k = 1 - Math.exp(-dt * 4.4);
+  camera.position.lerp(desiredCamera, k);
+  cameraTarget.lerp(desiredTarget, k);
+  camera.lookAt(cameraTarget);
+}
 
 function animate(now) {
   requestAnimationFrame(animate);
+  const time = now * 0.001;
   const dt = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
 
-  const pw = document.documentElement.clientWidth;
-  const ph = document.documentElement.clientHeight;
+  resize(document.documentElement.clientWidth, document.documentElement.clientHeight);
+  scrollProgress += (targetScrollProgress - scrollProgress) * Math.min(dt * 5.5, 1);
+  progressFill.style.height = `${Math.round(scrollProgress * 100)}%`;
+  progressNode.style.top = `${scrollProgress * 100}%`;
 
-  // ── Update pet radii (smooth lerp on hover) ──
-  for (let i = 0; i < pets.length; i++) {
-    const p = pets[i];
-    p.r += (p.targetR - p.r) * Math.min(dt * 8, 1);
-  }
+  streamLayers.forEach((layer) => {
+    layer.texture.offset.y += dt * layer.speed * layer.direction;
+    layer.mesh.rotation.y += dt * layer.spin;
+  });
+  halo.rotation.y += dt * 0.03;
+  axis.material.opacity = 0.28 + Math.sin(time * 1.6) * 0.08;
 
-  // ── Apply pet velocity (from collisions only, with friction) ──
-  for (let i = 0; i < pets.length; i++) {
-    const p = pets[i];
-    if (p.dragging) continue;
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    // Friction — slow down quickly
-    p.vx *= Math.max(0, 1 - 5 * dt);
-    p.vy *= Math.max(0, 1 - 5 * dt);
-    // Clamp inside viewport
-    if (p.x - p.r < 0) {
-      p.x = p.r;
-      p.vx = Math.abs(p.vx);
-    }
-    if (p.x + p.r > pw) {
-      p.x = pw - p.r;
-      p.vx = -Math.abs(p.vx);
-    }
-    if (p.y - p.r < GUTTER * 0.5) {
-      p.y = p.r + GUTTER * 0.5;
-      p.vy = Math.abs(p.vy);
-    }
-    if (p.y + p.r > ph - STATS_BAR_HEIGHT) {
-      p.y = ph - STATS_BAR_HEIGHT - p.r;
-      p.vy = -Math.abs(p.vy);
-    }
-  }
+  dust.rotation.y += dt * 0.018;
+  dust.rotation.x = Math.sin(time * 0.08) * 0.045;
+  distantDust.rotation.y -= dt * 0.011;
 
-  // ── Pet-pet collision ──
-  for (let i = 0; i < pets.length; i++) {
-    const a = pets[i];
-    for (let j = i + 1; j < pets.length; j++) {
-      const b = pets[j];
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const minDist = a.r + b.r + 10;
-      if (dist < minDist && dist > 0.1) {
-        const overlap = minDist - dist;
-        const nx = dx / dist;
-        const ny = dy / dist;
-        const push = overlap * 120;
-        if (!a.dragging) {
-          a.vx -= nx * push * dt;
-          a.vy -= ny * push * dt;
-        }
-        if (!b.dragging) {
-          b.vx += nx * push * dt;
-          b.vy += ny * push * dt;
-        }
-      }
-    }
-  }
-
-  // ── Circle obstacles for text ──
-  const circleObs = pets.map((p) => ({
-    cx: p.x,
-    cy: p.y,
-    r: p.r,
-    hPad: 14,
-    vPad: 4,
-  }));
-
-  const t0 = performance.now();
-
-  // ── Headline ──
-  const headlineWidth = Math.min(pw - GUTTER * 2, 1000);
-  const maxHeadlineH = Math.floor(ph * 0.25);
-  const { fontSize: hlSize, lines: hlLines } = fitHeadline(
-    headlineWidth,
-    maxHeadlineH,
-  );
-  const hlLineHeight = Math.round(hlSize * 0.93);
-  const hlFont = `700 ${hlSize}px ${HEADLINE_FONT_FAMILY}`;
-  const hlHeight = hlLines.length * hlLineHeight;
-
-  syncPool(headlinePool, hlLines.length, "headline-line");
-  for (let i = 0; i < hlLines.length; i++) {
-    const el = headlinePool[i];
-    const line = hlLines[i];
-    el.textContent = line.text;
-    el.style.left = GUTTER + "px";
-    el.style.top = GUTTER + line.y + "px";
-    el.style.font = hlFont;
-    el.style.lineHeight = hlLineHeight + "px";
-  }
-
-  // ── Body layout ──
-  const bodyTop = GUTTER + hlHeight + 20;
-  const bodyHeight = ph - bodyTop - STATS_BAR_HEIGHT - 8;
-  const colCount = pw > 1000 ? 3 : pw > 640 ? 2 : 1;
-  const totalGutter = GUTTER * 2 + COL_GAP * (colCount - 1);
-  const maxContentW = Math.min(pw, 1500);
-  const colWidth = Math.floor((maxContentW - totalGutter) / colCount);
-  const contentLeft = Math.round(
-    (pw - (colCount * colWidth + (colCount - 1) * COL_GAP)) / 2,
-  );
-  const col0X = contentLeft;
-
-  // Drop cap rect obstacle
-  const dropCapRect = {
-    x: col0X - 2,
-    y: bodyTop - 2,
-    w: DROP_CAP_TOTAL_W,
-    h: DROP_CAP_LINES * BODY_LINE_HEIGHT + 2,
-  };
-  dropCapEl.style.left = col0X + "px";
-  dropCapEl.style.top = bodyTop + "px";
-
-  // ── Pull quotes placement ──
-  const pqPlacements = [
-    { colIdx: 0, yFrac: 0.12, wFrac: 0.48, side: "right" },
-    { colIdx: 0, yFrac: 0.52, wFrac: 0.5, side: "left" },
-    { colIdx: 1, yFrac: 0.2, wFrac: 0.48, side: "left" },
-    { colIdx: 1, yFrac: 0.62, wFrac: 0.5, side: "right" },
-    { colIdx: 2, yFrac: 0.35, wFrac: 0.48, side: "right" },
-  ];
-
-  const pqRects = [];
-  for (let pi = 0; pi < pqPlacements.length; pi++) {
-    const p = pqPlacements[pi];
-    if (p.colIdx >= colCount) continue;
-    const pqEntry = preparedPQ[pi];
-    if (!pqEntry) continue;
-    const pqW = Math.round(colWidth * p.wFrac);
-    const result = layout(pqEntry.prepared, pqW - 20, PQ_LINE_HEIGHT);
-    const pqH = result.height + 16;
-    const colX = contentLeft + p.colIdx * (colWidth + COL_GAP);
-    const pqX = p.side === "right" ? colX + colWidth - pqW : colX;
-    const pqY = Math.round(bodyTop + bodyHeight * p.yFrac);
-    const pqLayoutLines = layoutWithLines(
-      pqEntry.prepared,
-      pqW - 20,
-      PQ_LINE_HEIGHT,
-    );
-    const pqPosLines = pqLayoutLines.lines.map((l, i) => ({
-      x: pqX + 20,
-      y: pqY + 8 + i * PQ_LINE_HEIGHT,
-      text: l.text,
-      width: l.width,
-    }));
-    pqRects.push({
-      x: pqX,
-      y: pqY,
-      w: pqW,
-      h: pqH,
-      lines: pqPosLines,
-      colIdx: p.colIdx,
-      link: pqEntry.link,
-    });
-  }
-
-  // ── Layout columns ──
-  const allBodyLines = [];
-  let cursor = { segmentIndex: 0, graphemeIndex: 0 }; // body text already excludes drop cap
-
-  for (let col = 0; col < colCount; col++) {
-    const colX = contentLeft + col * (colWidth + COL_GAP);
-    const rects = [];
-    if (col === 0) rects.push(dropCapRect);
-    for (let pi = 0; pi < pqRects.length; pi++) {
-      if (pqRects[pi].colIdx === col) {
-        rects.push({
-          x: pqRects[pi].x,
-          y: pqRects[pi].y,
-          w: pqRects[pi].w,
-          h: pqRects[pi].h,
-        });
-      }
-    }
-    const result = layoutColumn(
-      preparedBody,
-      cursor,
-      colX,
-      bodyTop,
-      colWidth,
-      bodyHeight,
-      BODY_LINE_HEIGHT,
-      circleObs,
-      rects,
-    );
-    allBodyLines.push(...result.lines);
-    cursor = result.cursor;
-  }
-
-  const reflowTime = performance.now() - t0;
-
-  // ── Update DOM: body lines ──
-  syncPool(linePool, allBodyLines.length, "line");
-  for (let i = 0; i < allBodyLines.length; i++) {
-    const el = linePool[i];
-    const line = allBodyLines[i];
-    el.textContent = line.text;
-    el.style.left = line.x + "px";
-    el.style.top = line.y + "px";
-    el.style.font = BODY_FONT;
-    el.style.lineHeight = BODY_LINE_HEIGHT + "px";
-  }
-
-  // ── Update DOM: pull quotes ──
-  let totalPQLines = 0;
-  for (let pi = 0; pi < pqRects.length; pi++)
-    totalPQLines += pqRects[pi].lines.length;
-
-  syncPool(pqBoxPool, pqRects.length, "pullquote-box");
-  syncPool(pqLinePool, totalPQLines, "pullquote-line");
-
-  let pqLineIdx = 0;
-  for (let pi = 0; pi < pqRects.length; pi++) {
-    const pq = pqRects[pi];
-    const boxEl = pqBoxPool[pi];
-    boxEl.style.left = pq.x + "px";
-    boxEl.style.top = pq.y + "px";
-    boxEl.style.width = pq.w + "px";
-    boxEl.style.height = pq.h + "px";
-    if (pq.link) {
-      boxEl.dataset.link = pq.link;
-      boxEl.classList.add("pullquote-link");
-    } else {
-      delete boxEl.dataset.link;
-      boxEl.classList.remove("pullquote-link");
-    }
-    for (let li = 0; li < pq.lines.length; li++) {
-      const el = pqLinePool[pqLineIdx];
-      const line = pq.lines[li];
-      el.textContent = line.text;
-      el.style.left = line.x + "px";
-      el.style.top = line.y + "px";
-      el.style.font = PQ_FONT;
-      el.style.lineHeight = PQ_LINE_HEIGHT + "px";
-      pqLineIdx++;
-    }
-  }
-
-  // ── Update DOM: pets ──
-  for (let i = 0; i < pets.length; i++) {
-    const p = pets[i];
-    const size = p.r * 2;
-    p.el.style.left = p.x - p.r + "px";
-    p.el.style.top = p.y - p.r + "px";
-    p.el.style.width = size + "px";
-    p.el.style.height = size + "px";
-  }
-
-  // ── Cursor style ──
-  const hovered = hitTestPets(pointerX, pointerY);
-  document.body.style.cursor = activePet ? "grabbing" : hovered ? "grab" : "";
-
-  // ── Stats ──
-  updateFPS(now);
-  elSLines.textContent = String(allBodyLines.length);
-  elSReflow.textContent = reflowTime.toFixed(1) + "ms";
-  if (elSDom) elSDom.textContent = "0";
-  elSFps.textContent = String(fpsDisplay);
-  elSCols.textContent = String(colCount);
+  updateCamera(dt);
+  updateBlocks(time, dt);
+  updatePointer();
+  renderer.render(scene, camera);
 }
 
-lastTime = performance.now();
+document.querySelectorAll(".lang-btn").forEach((item) => {
+  item.classList.toggle("active", item.dataset.lang === currentLang);
+});
+rebuildBlocks();
+camera.position.set(getCameraOrbitRadius(), BLOCK_TOP_Y + 0.2, 0);
+cameraTarget.set(0, BLOCK_TOP_Y, 0);
 requestAnimationFrame(animate);

@@ -23,5 +23,8 @@
   "devDependencies": {
     "@chenglou/pretext": "^0.0.4",
     "vite": "^8.0.3"
+  },
+  "dependencies": {
+    "three": "^0.184.0"
   }
 }
