@@ -9,9 +9,10 @@ body {
   height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 48% 58%, rgba(95, 160, 190, 0.12), rgba(3, 5, 10, 0) 34%),
-    radial-gradient(circle at 84% 76%, rgba(108, 134, 255, 0.08), rgba(3, 5, 10, 0) 32%),
-    linear-gradient(180deg, #070913 0%, #020308 58%, #000103 100%);
+    radial-gradient(circle at 24% 18%, rgba(244, 214, 155, 0.1), rgba(3, 5, 10, 0) 28%),
+    radial-gradient(circle at 76% 32%, rgba(199, 179, 255, 0.12), rgba(3, 5, 10, 0) 34%),
+    radial-gradient(circle at 52% 66%, rgba(174, 200, 255, 0.15), rgba(3, 5, 10, 0) 38%),
+    linear-gradient(180deg, #070912 0%, #02040a 56%, #000103 100%);
   color: #f4f8ff;
 }
 
@@ -43,15 +44,24 @@ body {
 
 #stage::before {
   background:
-    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.06), transparent 18%),
-    radial-gradient(ellipse at 50% 74%, rgba(143, 255, 231, 0.08), transparent 38%);
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.05), transparent 18%),
+    radial-gradient(ellipse at 46% 72%, rgba(200, 255, 245, 0.07), transparent 36%),
+    linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.035) 48%, transparent 52%);
   mix-blend-mode: screen;
 }
 
 #stage::after {
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.035)),
-    radial-gradient(ellipse at center, transparent 34%, rgba(0, 0, 0, 0.48) 100%);
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.018) 0,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    linear-gradient(90deg, rgba(244, 214, 155, 0.035), transparent 18%, transparent 82%, rgba(174, 200, 255, 0.035)),
+    radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.6) 100%);
+  opacity: 0.76;
 }
 
 .world-canvas {
@@ -60,7 +70,7 @@ body {
   z-index: 2;
   width: 100%;
   height: 100%;
-  filter: saturate(1.08) contrast(1.08);
+  filter: saturate(1.16) contrast(1.12);
 }
 
 .top-bar {
@@ -75,18 +85,20 @@ body {
   display: flex;
   gap: 10px;
   align-items: center;
-  padding: 9px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
-  background: rgba(2, 5, 10, 0.42);
-  box-shadow: 0 0 28px rgba(119, 189, 255, 0.08);
+  background: rgba(2, 5, 10, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 34px rgba(174, 200, 255, 0.11);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   pointer-events: auto;
 }
 
 .lang-switch a {
-  color: rgba(255, 255, 255, 0.46);
+  color: rgba(255, 255, 255, 0.42);
   font:
     700 11px/1 "Courier New",
     Consolas,
@@ -97,7 +109,9 @@ body {
 .lang-switch a:hover,
 .lang-switch a.active {
   color: #eaffff;
-  text-shadow: 0 0 12px rgba(143, 255, 231, 0.65);
+  text-shadow:
+    0 0 10px rgba(200, 255, 245, 0.72),
+    0 0 22px rgba(174, 200, 255, 0.42);
 }
 
 .lang-sep {
@@ -125,8 +139,8 @@ body {
   bottom: 0;
   left: 50%;
   width: 1px;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 0 20px rgba(143, 255, 231, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 24px rgba(174, 200, 255, 0.22);
   content: "";
   transform: translateX(-50%);
 }
@@ -137,10 +151,10 @@ body {
   left: 50%;
   width: 2px;
   height: 0%;
-  background: linear-gradient(#eaffff, #8fffe7 42%, #87b7ff 100%);
+  background: linear-gradient(#fff7e8, #c8fff5 42%, #aec8ff 100%);
   box-shadow:
-    0 0 14px rgba(143, 255, 231, 0.65),
-    0 0 34px rgba(135, 183, 255, 0.36);
+    0 0 14px rgba(200, 255, 245, 0.65),
+    0 0 34px rgba(174, 200, 255, 0.36);
   transform: translateX(-50%);
 }
 
@@ -152,10 +166,11 @@ body {
   height: 12px;
   border: 1px solid rgba(255, 255, 255, 0.86);
   border-radius: 50%;
-  background: #f7ffff;
+  background: #fffaf1;
   box-shadow:
-    0 0 0 5px rgba(143, 255, 231, 0.1),
-    0 0 24px rgba(143, 255, 231, 0.82);
+    0 0 0 5px rgba(200, 255, 245, 0.1),
+    0 0 24px rgba(200, 255, 245, 0.82),
+    0 0 48px rgba(244, 214, 155, 0.32);
   transform: translate(-50%, -50%);
 }
 

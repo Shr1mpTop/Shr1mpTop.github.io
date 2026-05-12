@@ -2,6 +2,10 @@ import zh from "./locales/zh.js";
 import en from "./locales/en.js";
 import { layoutWithLines, prepareWithSegments } from "@chenglou/pretext";
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 const locales = { zh, en };
 let currentLang = "zh";
@@ -28,10 +32,10 @@ const SECTION_IDS = [
 const BLOCK_TOP_Y = 15;
 const BLOCK_SPAN_Y = 31;
 const HELIX_STEP = 1.42;
-const BLOCK_ORBIT_RADIUS = 2.15;
-const CAMERA_ORBIT_RADIUS = 6.25;
-const BLOCK_BODY_FONT = '500 31px "Helvetica Neue", Arial, sans-serif';
-const BLOCK_BODY_LINE_HEIGHT = 42;
+const BLOCK_ORBIT_RADIUS = 2.32;
+const CAMERA_ORBIT_RADIUS = 6.85;
+const BLOCK_BODY_FONT = '500 28px "Helvetica Neue", Arial, sans-serif';
+const BLOCK_BODY_LINE_HEIGHT = 38;
 
 function stripHtml(html = "") {
   return String(html).replace(/<[^>]*>/g, "");
@@ -70,13 +74,13 @@ const sectionLinks = {
 };
 
 const sectionColors = {
-  bio: 0x8fffe7,
-  research: 0x87b7ff,
-  publications: 0xffd36e,
-  projects: 0xb899ff,
-  skills: 0xff8b72,
-  experience: 0xff7fca,
-  awards: 0xd9ff75,
+  bio: 0xc8fff5,
+  research: 0xaec8ff,
+  publications: 0xf4d69b,
+  projects: 0xc7b3ff,
+  skills: 0xffb29e,
+  experience: 0xffaed8,
+  awards: 0xe4f7b0,
 };
 
 function compactText(parts, max = 170) {
@@ -107,13 +111,23 @@ function colorToCss(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
 function makeAsciiTexture(seed, variant = "cyan") {
   const canvas = document.createElement("canvas");
-  canvas.width = 256;
+  canvas.width = 320;
   canvas.height = 2048;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.font = '700 18px "Courier New", Consolas, monospace';
+  ctx.font = '700 15px "Courier New", Consolas, monospace';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
@@ -125,13 +139,13 @@ function makeAsciiTexture(seed, variant = "cyan") {
   const chars = "01{}[]<>/\\|#$%&+=*-:;AIWEB3ZK";
   const palette =
     variant === "warm"
-      ? ["rgba(255, 224, 139,", "rgba(255, 127, 202,", "rgba(255, 255, 255,"]
-      : ["rgba(143, 255, 231,", "rgba(135, 183, 255,", "rgba(255, 255, 255,"];
+      ? ["rgba(244, 214, 155,", "rgba(255, 174, 216,", "rgba(255, 255, 255,"]
+      : ["rgba(200, 255, 245,", "rgba(174, 200, 255,", "rgba(255, 255, 255,"];
 
-  for (let y = 8; y < canvas.height; y += 24) {
-    for (let x = 16; x < canvas.width; x += 24) {
-      if (rand() < 0.18) continue;
-      const alpha = 0.14 + rand() * 0.78;
+  for (let y = 8; y < canvas.height; y += 20) {
+    for (let x = 16; x < canvas.width; x += 22) {
+      if (rand() < 0.32) continue;
+      const alpha = 0.08 + rand() * 0.48;
       ctx.fillStyle = `${palette[Math.floor(rand() * palette.length)]}${alpha})`;
       ctx.fillText(chars[Math.floor(rand() * chars.length)], x + (rand() - 0.5) * 8, y);
     }
@@ -156,50 +170,145 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
 
 function makeBlockTexture(block) {
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 512;
+  canvas.width = 1400;
+  canvas.height = 760;
   const ctx = canvas.getContext("2d");
   const accent = block.color;
+  const w = canvas.width;
+  const h = canvas.height;
 
-  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, "rgba(4, 8, 14, 0.82)");
-  gradient.addColorStop(0.52, colorToCss(accent, 0.16));
-  gradient.addColorStop(1, "rgba(0, 0, 0, 0.92)");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, w, h);
 
-  ctx.strokeStyle = colorToCss(accent, 0.76);
-  ctx.lineWidth = 3;
-  ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-  ctx.strokeRect(46, 46, canvas.width - 92, canvas.height - 92);
+  const outerGlow = ctx.createRadialGradient(w * 0.5, h * 0.48, 20, w * 0.5, h * 0.5, w * 0.72);
+  outerGlow.addColorStop(0, colorToCss(accent, 0.08));
+  outerGlow.addColorStop(0.56, "rgba(255, 255, 255, 0.018)");
+  outerGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = outerGlow;
+  ctx.fillRect(0, 0, w, h);
 
-  ctx.font = '700 24px "Courier New", Consolas, monospace';
-  ctx.fillStyle = colorToCss(accent, 0.95);
-  ctx.fillText(`BLOCK ${String(block.index + 1).padStart(2, "0")} / ${block.id.toUpperCase()}`, 76, 96);
+  roundRectPath(ctx, 60, 70, w - 120, h - 140, 34);
+  const glass = ctx.createLinearGradient(60, 70, w - 60, h - 70);
+  glass.addColorStop(0, "rgba(255, 255, 255, 0.08)");
+  glass.addColorStop(0.08, colorToCss(accent, 0.075));
+  glass.addColorStop(0.48, "rgba(10, 17, 27, 0.66)");
+  glass.addColorStop(1, "rgba(0, 0, 0, 0.82)");
+  ctx.fillStyle = glass;
+  ctx.fill();
 
-  ctx.font = '800 58px "Helvetica Neue", Arial, sans-serif';
-  ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-  ctx.fillText(block.title.toUpperCase(), 74, 178);
+  ctx.save();
+  roundRectPath(ctx, 60, 70, w - 120, h - 140, 34);
+  ctx.clip();
+  const sheen = ctx.createLinearGradient(90, 94, w - 140, h * 0.58);
+  sheen.addColorStop(0, "rgba(255, 255, 255, 0.075)");
+  sheen.addColorStop(0.16, "rgba(255, 255, 255, 0.028)");
+  sheen.addColorStop(0.32, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = sheen;
+  ctx.fillRect(60, 70, w - 120, h - 140);
+
+  for (let i = 0; i < 160; i++) {
+    const x = 95 + Math.random() * (w - 190);
+    const y = 105 + Math.random() * (h - 210);
+    const alpha = 0.035 + Math.random() * 0.1;
+    ctx.fillStyle = Math.random() > 0.78 ? colorToCss(accent, alpha) : `rgba(255, 255, 255, ${alpha})`;
+    ctx.fillRect(x, y, 1 + Math.random() * 2.2, 1 + Math.random() * 2.2);
+  }
+
+  for (let y = 140; y < h - 130; y += 58) {
+    ctx.strokeStyle = `rgba(255, 255, 255, ${y % 116 === 0 ? 0.035 : 0.018})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(112, y);
+    ctx.lineTo(w - 112, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  const stroke = ctx.createLinearGradient(60, 70, w - 60, h - 70);
+  stroke.addColorStop(0, "rgba(255, 255, 255, 0.28)");
+  stroke.addColorStop(0.22, colorToCss(accent, 0.52));
+  stroke.addColorStop(0.6, "rgba(255, 255, 255, 0.08)");
+  stroke.addColorStop(1, colorToCss(accent, 0.32));
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 2.5;
+  roundRectPath(ctx, 60, 70, w - 120, h - 140, 34);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.lineWidth = 1;
+  roundRectPath(ctx, 86, 96, w - 172, h - 192, 22);
+  ctx.stroke();
+
+  ctx.fillStyle = colorToCss(accent, 0.48);
+  roundRectPath(ctx, 104, 126, 8, h - 252, 4);
+  ctx.fill();
+
+  ctx.font = '700 22px "Courier New", Consolas, monospace';
+  ctx.fillStyle = colorToCss(accent, 0.88);
+  ctx.fillText(`${String(block.index + 1).padStart(2, "0")} / ${block.id.toUpperCase()} / PRETEXT NODE`, 136, 150);
+
+  ctx.font = '800 70px "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+  ctx.shadowColor = colorToCss(accent, 0.3);
+  ctx.shadowBlur = 18;
+  ctx.fillText(block.title.toUpperCase(), 134, 250);
+  ctx.shadowBlur = 0;
 
   ctx.font = BLOCK_BODY_FONT;
-  ctx.fillStyle = "rgba(225, 244, 255, 0.78)";
-  wrapCanvasText(ctx, block.body, 78, 252, 820, BLOCK_BODY_LINE_HEIGHT, 4);
+  ctx.fillStyle = "rgba(231, 240, 247, 0.72)";
+  wrapCanvasText(ctx, block.body, 138, 338, 1020, BLOCK_BODY_LINE_HEIGHT, 4);
 
   ctx.font = '700 18px "Courier New", Consolas, monospace';
-  ctx.fillStyle = "rgba(255, 255, 255, 0.34)";
-  ctx.fillText("SELF-LIT DATA NODE // CLICK TO OPEN", 76, 444);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.32)";
+  ctx.fillText("SELF-LIT GLASS NODE // CLICK TO OPEN", 136, 610);
 
-  for (let i = 0; i < 90; i++) {
-    const x = 54 + Math.random() * 910;
-    const y = 54 + Math.random() * 400;
-    ctx.fillStyle = colorToCss(accent, 0.08 + Math.random() * 0.18);
-    ctx.fillRect(x, y, 1 + Math.random() * 3, 1 + Math.random() * 3);
-  }
+  ctx.fillStyle = colorToCss(accent, 0.78);
+  ctx.beginPath();
+  ctx.arc(w - 150, 148, 13, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.36)";
+  ctx.beginPath();
+  ctx.arc(w - 150, 148, 32, 0, Math.PI * 1.62);
+  ctx.stroke();
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
+  return texture;
+}
+
+function makePanelGlowTexture(color) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 768;
+  canvas.height = 420;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.shadowColor = colorToCss(color, 0.78);
+  ctx.shadowBlur = 42;
+  ctx.strokeStyle = colorToCss(color, 0.38);
+  ctx.lineWidth = 7;
+  roundRectPath(ctx, 92, 82, canvas.width - 184, canvas.height - 164, 42);
+  ctx.stroke();
+  ctx.restore();
+
+  const beam = ctx.createRadialGradient(
+    canvas.width * 0.5,
+    canvas.height * 0.5,
+    10,
+    canvas.width * 0.5,
+    canvas.height * 0.5,
+    canvas.width * 0.54,
+  );
+  beam.addColorStop(0, colorToCss(color, 0.08));
+  beam.addColorStop(0.42, colorToCss(color, 0.035));
+  beam.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = beam;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
   return texture;
 }
 
@@ -220,28 +329,36 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setClearColor(0x000000, 0);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x03050a, 0.035);
+scene.fog = new THREE.FogExp2(0x02040a, 0.041);
 
 const camera = new THREE.PerspectiveCamera(48, W0 / H0, 0.1, 120);
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
 const desiredTarget = new THREE.Vector3();
 
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(W0, H0), 0.26, 0.48, 0.62);
+const outputPass = new OutputPass();
+composer.addPass(renderPass);
+composer.addPass(bloomPass);
+composer.addPass(outputPass);
+
 const dataColumn = new THREE.Group();
 scene.add(dataColumn);
 
 const streamLayers = [];
 for (let i = 0; i < 14; i++) {
-  const radius = 0.48 + i * 0.035;
+  const radius = 0.32 + i * 0.025;
   const height = 44;
-  const thetaLength = Math.PI * (0.26 + (i % 4) * 0.08);
+  const thetaLength = Math.PI * (0.2 + (i % 4) * 0.065);
   const thetaStart = (i / 14) * Math.PI * 2;
   const texture = makeAsciiTexture(i + 11, i % 5 === 0 ? "warm" : "cyan");
   const geometry = new THREE.CylinderGeometry(radius, radius, height, 28, 1, true, thetaStart, thetaLength);
   const material = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
-    opacity: 0.18 + (i % 5) * 0.045,
+    opacity: 0.028 + (i % 5) * 0.015,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     side: THREE.DoubleSide,
@@ -252,7 +369,7 @@ for (let i = 0; i < 14; i++) {
   streamLayers.push({
     mesh,
     texture,
-    speed: 0.06 + (i % 6) * 0.022,
+    speed: 0.07 + (i % 6) * 0.026,
     direction: i % 2 === 0 ? 1 : -1,
     spin: (i % 2 === 0 ? 1 : -1) * (0.035 + i * 0.002),
   });
@@ -260,9 +377,9 @@ for (let i = 0; i < 14; i++) {
 
 const haloGeometry = new THREE.CylinderGeometry(0.72, 0.72, 44, 64, 1, true);
 const haloMaterial = new THREE.MeshBasicMaterial({
-  color: 0x87b7ff,
+  color: 0xaec8ff,
   transparent: true,
-  opacity: 0.045,
+  opacity: 0.018,
   depthWrite: false,
   blending: THREE.AdditiveBlending,
   side: THREE.DoubleSide,
@@ -271,14 +388,32 @@ const halo = new THREE.Mesh(haloGeometry, haloMaterial);
 dataColumn.add(halo);
 
 const axisMaterial = new THREE.MeshBasicMaterial({
-  color: 0xdffcff,
+  color: 0xf7ffff,
   transparent: true,
-  opacity: 0.36,
+  opacity: 0.1,
   depthWrite: false,
   blending: THREE.AdditiveBlending,
 });
-const axis = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 44, 16), axisMaterial);
+const axis = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 44, 16), axisMaterial);
 dataColumn.add(axis);
+
+const energyRings = [];
+for (let i = 0; i < SECTION_IDS.length; i++) {
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.78 + (i % 2) * 0.1, 0.004, 8, 96),
+    new THREE.MeshBasicMaterial({
+      color: i % 3 === 0 ? 0xf4d69b : 0xc8fff5,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = BLOCK_TOP_Y - i * (BLOCK_SPAN_Y / Math.max(1, SECTION_IDS.length - 1));
+  dataColumn.add(ring);
+  energyRings.push(ring);
+}
 
 const blockGroup = new THREE.Group();
 scene.add(blockGroup);
@@ -299,9 +434,9 @@ for (let i = 0; i <= 360; i++) {
 const helixGuide = new THREE.Line(
   new THREE.BufferGeometry().setFromPoints(helixPoints),
   new THREE.LineBasicMaterial({
-    color: 0xbfefff,
+    color: 0xf8ffff,
     transparent: true,
-    opacity: 0.18,
+    opacity: 0.025,
     blending: THREE.AdditiveBlending,
   }),
 );
@@ -318,6 +453,11 @@ let scrollProgress = initialProgress;
 let targetScrollProgress = initialProgress;
 let draggingRail = false;
 let lastTime = performance.now();
+let scrollEnergy = 0;
+let pointerTargetX = 0;
+let pointerTargetY = 0;
+let pointerSmoothX = 0;
+let pointerSmoothY = 0;
 
 function disposeObject(object) {
   object.traverse((child) => {
@@ -342,29 +482,45 @@ function rebuildBlocks() {
       map: texture,
       transparent: true,
       opacity: 0.9,
-      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
+      side: THREE.FrontSide,
     });
-    const edge = new THREE.MeshBasicMaterial({
-      color: block.color,
-      transparent: true,
-      opacity: 0.24,
-      blending: THREE.AdditiveBlending,
-    });
-    const geometry = new THREE.BoxGeometry(2.25, 1.14, 0.08);
-    const mesh = new THREE.Mesh(geometry, [edge, edge, edge, edge, front, front]);
+    const glowTexture = makePanelGlowTexture(block.color);
+    const geometry = new THREE.PlaneGeometry(2.82, 1.53, 10, 4);
+    const mesh = new THREE.Mesh(geometry, front);
+    const glow = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.24, 1.86, 1, 1),
+      new THREE.MeshBasicMaterial({
+        map: glowTexture,
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.04,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+      }),
+    );
+    glow.position.z = -0.018;
+    glow.raycast = () => {};
+    glow.renderOrder = 3;
+    mesh.add(glow);
     const line = new THREE.LineSegments(
       new THREE.EdgesGeometry(geometry),
       new THREE.LineBasicMaterial({
         color: block.color,
         transparent: true,
-        opacity: 0.72,
+        opacity: 0.02,
         blending: THREE.AdditiveBlending,
       }),
     );
+    line.raycast = () => {};
+    line.renderOrder = 5;
     mesh.add(line);
+    mesh.renderOrder = 4;
     mesh.userData.block = block;
     mesh.userData.front = front;
-    mesh.userData.edge = edge;
+    mesh.userData.glow = glow;
     mesh.userData.line = line;
     blockGroup.add(mesh);
     return mesh;
@@ -449,13 +605,15 @@ function clamp01(value) {
 
 function resize(width, height) {
   renderer.setSize(width, height, false);
+  composer.setSize(width, height);
+  bloomPass.resolution.set(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
 }
 
 function getCameraOrbitRadius() {
   const w = document.documentElement.clientWidth;
-  return w < 520 ? 9.7 : w < 760 ? 8.6 : CAMERA_ORBIT_RADIUS;
+  return w < 520 ? 10.8 : w < 760 ? 9.1 : CAMERA_ORBIT_RADIUS;
 }
 
 function getPanelScaleFactor() {
@@ -488,6 +646,7 @@ window.addEventListener(
   (event) => {
     if (event.ctrlKey) return;
     targetScrollProgress = clamp01(targetScrollProgress + event.deltaY / 4200);
+    scrollEnergy = clamp01(scrollEnergy + Math.abs(event.deltaY) / 1400);
     event.preventDefault();
   },
   { passive: false },
@@ -509,6 +668,8 @@ window.addEventListener("keydown", (event) => {
 window.addEventListener("pointermove", (event) => {
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  pointerTargetX = pointer.x;
+  pointerTargetY = pointer.y;
 });
 
 stage.addEventListener("click", () => {
@@ -549,9 +710,10 @@ function updateBlocks(time, dt) {
     mesh.position.set(Math.cos(angle) * orbit, y, Math.sin(angle) * orbit);
     mesh.rotation.set(0, Math.PI / 2 - angle, 0);
     mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), Math.min(dt * 7, 1));
-    mesh.userData.front.opacity = 0.24 + visibility * 0.55 + (focus || hover ? 0.22 : 0);
-    mesh.userData.edge.opacity = 0.08 + visibility * 0.16 + (focus || hover ? 0.16 : 0);
-    mesh.userData.line.material.opacity = 0.24 + visibility * 0.46 + (focus || hover ? 0.22 : 0);
+    mesh.userData.front.opacity = 0.24 + visibility * 0.68 + (focus || hover ? 0.08 : 0);
+    mesh.userData.line.material.opacity = 0.008 + visibility * 0.022 + (focus || hover ? 0.026 : 0);
+    mesh.userData.glow.material.opacity = 0.012 + visibility * 0.035 + (focus ? 0.05 : 0) + (hover ? 0.06 : 0);
+    mesh.position.y += Math.sin(time * 1.7 + index * 0.9) * (focus ? 0.025 : 0.012);
     mesh.visible = visibility > 0.03;
   });
 }
@@ -567,21 +729,24 @@ function updateCamera(dt) {
   const y = BLOCK_TOP_Y - scrollProgress * BLOCK_SPAN_Y;
   const cameraAngle = scrollProgress * HELIX_STEP * Math.max(1, blockMeshes.length - 1);
   const activeAngle = activeIndex * HELIX_STEP;
-  const blendedAngle = THREE.MathUtils.lerp(cameraAngle, activeAngle, 0.18);
+  const blendedAngle = THREE.MathUtils.lerp(cameraAngle, activeAngle, 0.14);
+  pointerSmoothX += (pointerTargetX - pointerSmoothX) * Math.min(dt * 4, 1);
+  pointerSmoothY += (pointerTargetY - pointerSmoothY) * Math.min(dt * 4, 1);
   desiredCamera.set(
-    Math.cos(blendedAngle) * getCameraOrbitRadius(),
-    y + 0.24,
-    Math.sin(blendedAngle) * getCameraOrbitRadius(),
+    Math.cos(blendedAngle) * (getCameraOrbitRadius() + scrollEnergy * 0.55),
+    y + 0.18 + pointerSmoothY * 0.18,
+    Math.sin(blendedAngle) * (getCameraOrbitRadius() + scrollEnergy * 0.55),
   );
   desiredTarget.set(
-    Math.cos(blendedAngle) * 0.22,
-    y - 0.08,
-    Math.sin(blendedAngle) * 0.22,
+    Math.cos(blendedAngle) * 0.18 + pointerSmoothX * 0.14,
+    y - 0.08 - pointerSmoothY * 0.06,
+    Math.sin(blendedAngle) * 0.18,
   );
   const k = 1 - Math.exp(-dt * 4.4);
   camera.position.lerp(desiredCamera, k);
   cameraTarget.lerp(desiredTarget, k);
   camera.lookAt(cameraTarget);
+  camera.rotateZ(pointerSmoothX * 0.018 + scrollEnergy * 0.018);
 }
 
 function animate(now) {
@@ -592,6 +757,8 @@ function animate(now) {
 
   resize(document.documentElement.clientWidth, document.documentElement.clientHeight);
   scrollProgress += (targetScrollProgress - scrollProgress) * Math.min(dt * 5.5, 1);
+  scrollEnergy += (0 - scrollEnergy) * Math.min(dt * 2.4, 1);
+  activeIndex = Math.round(scrollProgress * Math.max(1, blockMeshes.length - 1));
   progressFill.style.height = `${Math.round(scrollProgress * 100)}%`;
   progressNode.style.top = `${scrollProgress * 100}%`;
 
@@ -600,7 +767,14 @@ function animate(now) {
     layer.mesh.rotation.y += dt * layer.spin;
   });
   halo.rotation.y += dt * 0.03;
-  axis.material.opacity = 0.28 + Math.sin(time * 1.6) * 0.08;
+  axis.material.opacity = 0.08 + Math.sin(time * 1.6) * 0.022;
+  energyRings.forEach((ring, index) => {
+    const focus = index === activeIndex ? 1 : 0;
+    const pulse = 0.5 + 0.5 * Math.sin(time * 1.8 + index);
+    ring.rotation.z += dt * (0.08 + index * 0.006);
+    ring.scale.setScalar(1 + focus * 0.18 + pulse * 0.018);
+    ring.material.opacity = 0.055 + focus * 0.24 + pulse * 0.05;
+  });
 
   dust.rotation.y += dt * 0.018;
   dust.rotation.x = Math.sin(time * 0.08) * 0.045;
@@ -609,13 +783,23 @@ function animate(now) {
   updateCamera(dt);
   updateBlocks(time, dt);
   updatePointer();
-  renderer.render(scene, camera);
+  composer.render();
 }
 
 document.querySelectorAll(".lang-btn").forEach((item) => {
   item.classList.toggle("active", item.dataset.lang === currentLang);
 });
 rebuildBlocks();
-camera.position.set(getCameraOrbitRadius(), BLOCK_TOP_Y + 0.2, 0);
-cameraTarget.set(0, BLOCK_TOP_Y, 0);
+activeIndex = Math.round(scrollProgress * Math.max(1, blockMeshes.length - 1));
+{
+  const initialY = BLOCK_TOP_Y - scrollProgress * BLOCK_SPAN_Y;
+  const initialAngle = scrollProgress * HELIX_STEP * Math.max(1, blockMeshes.length - 1);
+  camera.position.set(
+    Math.cos(initialAngle) * getCameraOrbitRadius(),
+    initialY + 0.18,
+    Math.sin(initialAngle) * getCameraOrbitRadius(),
+  );
+  cameraTarget.set(Math.cos(initialAngle) * 0.18, initialY - 0.08, Math.sin(initialAngle) * 0.18);
+  camera.lookAt(cameraTarget);
+}
 requestAnimationFrame(animate);
