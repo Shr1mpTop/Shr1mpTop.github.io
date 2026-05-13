@@ -1,9 +1,8 @@
 export default {
   headerName: "Zhili He",
   headerTitle: "Zhili He (何致力)",
-  headerDesc: "Researcher in Distributed Systems, Blockchain, and AI",
-  headerEdu1:
-    "Master's Student in Blockchain, Nanyang Technological University",
+  headerDesc: "Distributed Systems · Blockchain · Artificial Intelligence Researcher",
+  headerEdu1: "Master's Student in Blockchain, Nanyang Technological University",
   headerEdu2: "B.E. in Digital Media Technology, UESTC (2025)",
   resumeZhLink: "HeZhili_CV.pdf",
   resumeZhText: "简历 (中文)",
@@ -12,13 +11,13 @@ export default {
 
   bioTitle: "Biography",
   bioText:
-    "Master's student in Blockchain at NTU; B.E. in Digital Media Technology from UESTC (2025). Research focuses on distributed systems, blockchain, and AI — consensus protocols, zero-knowledge proofs, and AI-optimized blockchain systems. Hands-on experience in computer vision and NLP. National Scholarship recipient; provincial first prize in mathematical modeling.",
+    "Master's student in Blockchain at NTU; B.E. in Digital Media Technology from UESTC (2025). Research focuses on distributed systems, blockchain, and AI — consensus protocols, zero-knowledge proofs, and AI-optimized blockchain systems. Hands-on experience in computer vision and NLP. National Scholarship recipient; provincial first prize in mathematical modeling. Currently building next-generation decentralized intelligent system architectures.",
 
   researchTitle: "Research Interests",
   researchPoints: [
-    "Blockchain & Distributed Systems: consensus algorithms, protocol design, smart contract security, cross-chain integration",
-    "AI & Deep Learning: computer vision, medical image analysis, NLP, multi-agent systems",
-    "AI + Blockchain: decentralized AI privacy, trusted ML, blockchain-driven AI security",
+    "Blockchain & Distributed Systems: consensus algorithms, protocol design, smart contract security, cross-chain integration, zero-knowledge proofs",
+    "AI & Deep Learning: computer vision, medical image analysis, NLP, multi-agent systems, large language models",
+    "AI + Blockchain: decentralized AI privacy, trusted ML, blockchain-driven AI security, federated learning",
   ],
 
   pubTitle: "Publications & Projects",
@@ -115,10 +114,10 @@ export default {
       label: "Languages",
       value: "Python, C/C++, JavaScript/TypeScript, Go, Solidity, SQL",
     },
-    { label: "AI/ML", value: "PyTorch, TensorFlow, Scikit-learn, Keras" },
-    { label: "Web", value: "Vue.js, React, Node.js, Express, Nginx" },
-    { label: "Blockchain", value: "Ethereum, Smart Contracts, Web3.js" },
-    { label: "Tools", value: "Git, Docker, Linux, AWS" },
+    { label: "AI/ML", value: "PyTorch, TensorFlow, Scikit-learn, Keras, Mamba" },
+    { label: "Web", value: "Vue.js, React, Node.js, Express, Nginx, FastAPI" },
+    { label: "Blockchain", value: "Ethereum, Smart Contracts, Web3.js, ZKP, DeFi" },
+    { label: "Tools", value: "Git, Docker, Linux, AWS, Three.js, WebGL" },
   ],
 
   expTitle: "Experience",
@@ -127,6 +126,7 @@ export default {
     "B.E. (2025) — Digital Media Technology, UESTC. Multiple research projects.",
     "Research Assistant (2023-2024) — Enterprise dialogue system, 91% accuracy.",
     "Project Developer (2024-2025) — GI diagnosis system, 87.25% on Kvasir.",
+    "Open Source Contributor — 13+ GitHub repos spanning blockchain, AI, and full-stack web.",
   ],
 
   awardsTitle: "Honors & Awards",
@@ -136,5 +136,5 @@ export default {
     "2022: National Mathematical Modeling — Provincial 1st Prize",
   ],
 
-  footer: "© 2025 Zhili He | HEZH0014@e.ntu.edu.sg",
+  footer: "© 2025 Zhili He | HEZH0014@e.ntu.edu.sg | NTU Blockchain Lab",
 };

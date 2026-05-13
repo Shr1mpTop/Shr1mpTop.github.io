@@ -1,7 +1,7 @@
 export default {
   headerName: "Zhili He",
   headerTitle: "何致力 (Zhili He)",
-  headerDesc: "分布式系统、区块链与人工智能研究者",
+  headerDesc: "分布式系统 · 区块链 · 人工智能 研究者",
   headerEdu1: "南洋理工大学 区块链专业硕士研究生",
   headerEdu2: "电子科技大学 数字媒体技术学士学位 (2025)",
   resumeZhLink: "HeZhili_CV.pdf",
@@ -11,13 +11,13 @@ export default {
 
   bioTitle: "个人简介",
   bioText:
-    "南洋理工大学区块链硕士研究生，电子科技大学数字媒体技术学士 (2025)。研究方向聚焦分布式系统、区块链与人工智能交叉领域，致力于共识协议设计、零知识证明应用及AI优化区块链系统。本科期间在计算机视觉与NLP领域积累实战经验，获国家奖学金及数学建模竞赛省级一等奖。",
+    "南洋理工大学区块链硕士研究生，电子科技大学数字媒体技术学士 (2025)。研究方向聚焦分布式系统、区块链与人工智能交叉领域，致力于共识协议设计、零知识证明应用及AI优化区块链系统。本科期间在计算机视觉与NLP领域积累实战经验，获国家奖学金及数学建模竞赛省级一等奖。目前专注于构建下一代去中心化智能系统架构。",
 
   researchTitle: "研究方向",
   researchPoints: [
-    "区块链与分布式系统：共识算法、协议设计、智能合约安全、跨链集成",
-    "人工智能与深度学习：计算机视觉、医学图像分析、NLP、多智能体系统",
-    "AI + Blockchain：去中心化AI隐私保护、可信机器学习、区块链驱动AI安全架构",
+    "区块链与分布式系统：共识算法、协议设计、智能合约安全、跨链集成、零知识证明",
+    "人工智能与深度学习：计算机视觉、医学图像分析、NLP、多智能体系统、大语言模型",
+    "AI + Blockchain：去中心化AI隐私保护、可信机器学习、区块链驱动AI安全架构、联邦学习",
   ],
 
   pubTitle: "学术发表与项目",
@@ -114,10 +114,10 @@ export default {
       label: "编程语言",
       value: "Python, C/C++, JavaScript/TypeScript, Go, Solidity, SQL",
     },
-    { label: "AI/ML", value: "PyTorch, TensorFlow, Scikit-learn, Keras" },
-    { label: "Web", value: "Vue.js, React, Node.js, Express, Nginx" },
-    { label: "区块链", value: "Ethereum, Smart Contracts, Web3.js" },
-    { label: "工具", value: "Git, Docker, Linux, AWS" },
+    { label: "AI/ML", value: "PyTorch, TensorFlow, Scikit-learn, Keras, Mamba" },
+    { label: "Web", value: "Vue.js, React, Node.js, Express, Nginx, FastAPI" },
+    { label: "区块链", value: "Ethereum, Smart Contracts, Web3.js, ZKP, DeFi" },
+    { label: "工具", value: "Git, Docker, Linux, AWS, Three.js, WebGL" },
   ],
 
   expTitle: "经历",
@@ -126,6 +126,7 @@ export default {
     "学士 (2025) — 电子科技大学数字媒体技术，参与多项研究项目。",
     "研究助理 (2023-2024) — 企业级对话系统，对话准确率提升至91%。",
     "项目开发者 (2024-2025) — 胃肠道诊断系统，Kvasir准确率87.25%。",
+    "开源贡献者 — GitHub 13+ 开源项目，涵盖区块链、AI、Web全栈。",
   ],
 
   awardsTitle: "荣誉奖项",
@@ -135,5 +136,5 @@ export default {
     "2022 全国数学建模竞赛 省级一等奖",
   ],
 
-  footer: "© 2025 Zhili He | HEZH0014@e.ntu.edu.sg",
+  footer: "© 2025 Zhili He | HEZH0014@e.ntu.edu.sg | NTU Blockchain Lab",
 };
