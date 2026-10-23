@@ -15,48 +15,20 @@ This repository hosts the personal academic and professional website of Zhili He
 
 ## Structure
 
-- `index*.html`: Multi-language entry points of the website (Chinese, English, French, Japanese, Spanish, German).
-- `package.json`: Project configuration and Vite dependencies.
-- `src/main.js`: Core logic for text rendering, interactions, and multi-language switching.
-- `style.css`: Cascading Style Sheets for consistent styling.
+- `index.html`: Main Chinese version of the website.
+- `index-en.html`: English version.
+- `index-fr.html`: French version.
+- `index-ja.html`: Japanese version.
+- `index-es.html`: Spanish version.
+- `index-de.html`: German version.
+- `style.css`: Cascading Style Sheets for consistent styling across all pages.
+- `script.js`: JavaScript for interactive elements (if applicable).
 
 ## Technologies Used
 
-- **Frontend Environment**: Vite, JavaScript Modules (ESM)
-- **UI & Typography Engine**: `@chenglou/pretext` for high-performance text rendering
-- **Styling**: Vanilla CSS3
-- **Deployment**: GitHub Pages (Automated via GitHub Actions)
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Deployment**: GitHub Pages
 - **Version Control**: Git
-
-## Local Development
-
-Since this project uses Vite and npm packages, you need to run it in a Node.js environment locally.
-
-1. **Install Dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-2. **Run Local Development Server**:
-
-   ```bash
-   npm run dev
-   ```
-
-   This will start a local server (usually at `http://localhost:5173`) with Hot Module Replacement (HMR).
-
-3. **Build for Production**:
-   ```bash
-   npm run build
-   ```
-   This will bundle the Javascript and CSS into static files inside the `dist` folder.
-
-## Deployment
-
-This website is automatically deployed via **GitHub Actions**. Every push to the `main` branch triggers a workflow that builds the Vite project and deploys the static output to GitHub Pages.
-
-To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.github.io).
 
 ## Research Interests
 
@@ -85,14 +57,17 @@ To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.git
 
 - **Email**: HEZH0014@e.ntu.edu.sg
 - **GitHub**: [Shr1mpTop](https://github.com/Shr1mpTop)
-- **LinkedIn**: [Zhili He](https://www.linkedin.com/in/zhili-he)
+- **LinkedIn**: [Zhili He](https://www.linkedin.com/in/zhili-he) (if applicable)
+
+## Deployment
+
+This website is deployed via GitHub Pages. To view the live site, visit [https://shr1mptop.github.io](https://shr1mptop.github.io).
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
 This website represents a culmination of rigorous academic pursuit and professional dedication in the fields of computer science and technology. All content is original and reflects the author's commitment to advancing knowledge in distributed systems, blockchain, and artificial intelligence.</content>
-
 <parameter name="filePath">e:\github\Shr1mpTop.github.io\README.md

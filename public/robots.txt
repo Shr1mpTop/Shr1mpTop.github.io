@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://shr1mptop.github.io/sitemap.xml
